@@ -80,10 +80,19 @@ button:hover { background: rgba(127,255,193,0.12); cursor:pointer; }
   font-size: 0.85em;
 }
 
-/* Glitchy letters effect */
+/* Glitchy letters effect with RGB split + shake */
 .glitch-letter {
   display: inline-block;
-  animation: flicker 0.05s infinite;
+  position: relative;
+  animation: glitchChar 0.1s infinite;
+}
+
+@keyframes glitchChar {
+  0% { transform: translate(0,0); color:#d6f5e3; text-shadow:none;}
+  25% { transform: translate(-1px,1px); color:#9affc8; text-shadow:1px 0 #ff9a9a;}
+  50% { transform: translate(1px,-1px); color:#7fffc1; text-shadow:-1px 0 #ff9a9a,1px 0 #ff9a9a;}
+  75% { transform: translate(-1px,0); color:#d6f5e3; text-shadow:1px 0 #ff9a9a,-1px 0 #9affc8;}
+  100% { transform: translate(0,0); color:#d6f5e3; text-shadow:none;}
 }
 </style>
 </head>
@@ -134,13 +143,14 @@ const people = [
 
 let matched = null;
 
+// Glitchy letter reveal
 function typeGlitchLetters(text, container, index=0){
   if(index >= text.length) return;
   const span = document.createElement("span");
   span.className = "glitch-letter";
   span.innerText = text[index];
   container.appendChild(span);
-  setTimeout(()=>typeGlitchLetters(text, container, index+1), 60);
+  setTimeout(()=>typeGlitchLetters(text, container, index+1), 50 + Math.random()*30); // slight randomization for glitch
 }
 
 function typeLines(lines, i=0){
@@ -154,8 +164,27 @@ function typeLines(lines, i=0){
   }
 }
 
+// Self-destruct effect for your name
+function selfDestruct(){
+  document.body.innerHTML = "";
+  const msg = document.createElement("div");
+  msg.style.color = "#ff4a4a";
+  msg.style.fontFamily = "Courier New, monospace";
+  msg.style.fontSize = "2em";
+  msg.style.textAlign = "center";
+  msg.style.marginTop = "40vh";
+  msg.innerText = "ACCESS DENIED\nARCHIVE DESTROYED";
+  document.body.appendChild(msg);
+}
+
 function setName(){
   const name = document.getElementById("nameInput").value.toLowerCase().trim();
+  
+  if(["delta","napper"].includes(name)){
+    selfDestruct();
+    return;
+  }
+
   localStorage.setItem("archive_name", name);
   matched = people.find(p=>p.names.includes(name));
 
