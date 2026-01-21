@@ -43,7 +43,20 @@ h2 { color:#9affc8; margin-bottom:12px; }
   height:460px;
   border:none;
   opacity:0;
-  transition: opacity 1.2s ease-in-out;
+  transition: opacity 1s ease-in-out;
+}
+
+.spoiler.glitch::after {
+  content: "▌▌▌";
+  position: absolute;
+  top: 5px; left: 10px;
+  color:#ff9a9a;
+  animation: flicker 0.1s infinite;
+}
+
+@keyframes flicker {
+  0%,100% {opacity:1;}
+  50% {opacity:0;}
 }
 
 .error-fake {
@@ -136,12 +149,14 @@ h2 { color:#9affc8; margin-bottom:12px; }
 function toggleSpoiler(el){
   const iframe = el.querySelector("iframe");
   if(!iframe) return;
+  el.classList.add("glitch");
   if(iframe.style.display === "block") {
     iframe.style.display = "none";
     iframe.style.opacity = 0;
   } else {
     iframe.style.display = "block";
     setTimeout(()=>{ iframe.style.opacity = 1; }, 50);
+    setTimeout(()=>{ el.classList.remove("glitch"); }, 900); // glitch effect while fading
   }
 }
 
@@ -149,12 +164,11 @@ function toggleSpoiler(el){
 function fakeVideo(el){
   const error = el.querySelector(".error-fake");
   error.style.display = "block";
-  // Flicker animation
   let flicker = 0;
   const interval = setInterval(()=>{
     error.style.opacity = flicker % 2 === 0 ? 1 : 0.3;
     flicker++;
-    if(flicker > 10) clearInterval(interval);
+    if(flicker > 12) clearInterval(interval);
   },150);
 }
 
@@ -170,7 +184,9 @@ const endings = {
   leafy:"Statistically improbable.\nYet here you are.",
   alex:"Time compounds.\nSo do friendships.",
   ares:"Time compounds.\nSo do friendships.",
-  xia:"Stubborn as always.\nStill here."
+  xia:"Stubborn as always.\nStill here.",
+  mona:"Sweet and awkward.\nClues come eventually.",
+  mochi:"Sweet and awkward.\nClues come eventually."
 };
 document.getElementById("ending").innerText = endings[name] || "If you reached this,\nthen the archive wanted you here.";
 </script>
