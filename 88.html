@@ -1,94 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Hidden Archive</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Hidden Archive</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    body {
-      background: #0f1110;
-      color: #d6f5e3;
-      font-family: "Courier New", monospace;
-      margin: 0;
-    }
+<style>
+body {
+  background: #0f1110;
+  color: #d6f5e3;
+  font-family: "Courier New", monospace;
+  margin:0;
+}
 
-    .container {
-      max-width: 860px;
-      margin: auto;
-      padding: 50px 20px;
-    }
+.container { max-width: 900px; margin:auto; padding:50px 20px; }
 
-    h1 {
-      text-align: center;
-      color: #7fffc1;
-      margin-bottom: 50px;
-    }
+h1 { text-align:center; color:#7fffc1; margin-bottom:60px; }
 
-    .section {
-      margin-bottom: 40px;
-      padding: 20px;
-      border: 1px dashed rgba(127,255,193,0.3);
-      background: rgba(10,14,12,0.9);
-    }
+.section {
+  margin-bottom:50px;
+  padding:20px;
+  border:1px dashed rgba(127,255,193,0.3);
+  background: rgba(10,14,12,0.9);
+}
 
-    iframe {
-      width: 100%;
-      height: 460px;
-      border: none;
-    }
+h2 { color:#9affc8; margin-bottom:12px; }
 
-    .text-file {
-      white-space: pre-line;
-      background: rgba(0,0,0,0.35);
-      padding: 14px;
-      border-left: 3px solid #7fffc1;
-    }
+.spoiler {
+  background: rgba(0,0,0,0.2);
+  padding:10px;
+  cursor:pointer;
+  text-align:center;
+  user-select:none;
+}
 
-    .footer {
-      text-align: center;
-      opacity: 0.4;
-      margin-top: 60px;
-    }
-  </style>
+.spoiler iframe {
+  display:none;
+  margin-top:10px;
+  width:100%;
+  height:460px;
+  border:none;
+}
+
+.ending {
+  white-space: pre-line;
+  background: rgba(0,0,0,0.35);
+  padding:16px;
+  border-left:3px solid #7fffc1;
+}
+
+.footer { text-align:center; opacity:0.4; margin-top:70px; }
+</style>
 </head>
 <body>
 
 <div class="container">
-  <h1>Hidden Archive</h1>
+<h1>Hidden Archive</h1>
 
-  <div class="section"><iframe src="https://www.youtube.com/embed/Mg0yid5vbRc" allowfullscreen></iframe></div>
-  <div class="section"><iframe src="https://www.youtube.com/embed/V-EtXn2h3qA" allowfullscreen></iframe></div>
-  <div class="section"><iframe src="https://www.youtube.com/embed/jknp7khNAbk" allowfullscreen></iframe></div>
-  <div class="section"><iframe src="https://www.youtube.com/embed/CqmtTeHgO2E" allowfullscreen></iframe></div>
-  <div class="section"><iframe src="https://www.youtube.com/embed/KBoQu7vkF5A" allowfullscreen></iframe></div>
-
-  <div class="section">
-    <h2>Final Note</h2>
-    <div id="ending" class="text-file">…</div>
+<div class="section">
+  <h2>The Beginning</h2>
+  <div class="spoiler" onclick="toggleSpoiler(this)">Click to reveal
+    <iframe src="https://www.youtube.com/embed/Mg0yid5vbRc" allowfullscreen></iframe>
   </div>
+</div>
 
-  <div class="footer">88</div>
+<div class="section">
+  <h2>The Second Coming</h2>
+  <div class="spoiler" onclick="toggleSpoiler(this)">Click to reveal
+    <iframe src="https://www.youtube.com/embed/V-EtXn2h3qA" allowfullscreen></iframe>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Residual Noise</h2>
+  <div class="spoiler" onclick="toggleSpoiler(this)">Click to reveal
+    <iframe src="https://www.youtube.com/embed/jknp7khNAbk" allowfullscreen></iframe>
+  </div>
+</div>
+
+<div class="section">
+  <h2>DELT4</h2>
+  <div class="spoiler" onclick="toggleSpoiler(this)">Click to reveal
+    <iframe src="https://www.youtube.com/embed/CqmtTeHgO2E" allowfullscreen></iframe>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Last One. For Now</h2>
+  <div class="spoiler" onclick="toggleSpoiler(this)">Click to reveal
+    <iframe src="https://www.youtube.com/embed/KBoQu7vkF5A" allowfullscreen></iframe>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Afterword</h2>
+  <div id="ending" class="ending">…</div>
+</div>
+
+<div class="footer">88</div>
 </div>
 
 <script>
-const name = localStorage.getItem("archive_name") || "";
+function toggleSpoiler(el){
+  const iframe = el.querySelector("iframe");
+  iframe.style.display = iframe.style.display==="block"?"none":"block";
+}
 
+// Personalized endings
+const name = (localStorage.getItem("archive_name") || "").toLowerCase();
 const endings = {
-  mimi:"You didn’t really need to solve this.\nYou already knew.",
-  mie:"You didn’t really need to solve this.\nYou already knew.",
-  saga:"Context matters.\nYou paid attention.",
-  aloise:"As expected.\nNo surprises.",
-  snoopy:"Curiosity has a cost.\nYou’re still here.",
-  dorian:"Against all odds,\nyou made it.",
-  leafy:"Against all odds,\nyou made it.",
-  alex:"You’ve been here longer than most.\nThat still matters.",
-  ares:"You’ve been here longer than most.\nThat still matters."
+  mimi:"You didn’t need proof.\nYou already knew.",
+  mie:"You didn’t need proof.\nYou already knew.",
+  saga:"Context matters.\nYou noticed.",
+  aloise:"Predictable.\nIn a good way.",
+  snoopy:"Curiosity can hurt.\nYou kept going anyway.",
+  dorian:"Statistically improbable.\nYet here you are.",
+  leafy:"Statistically improbable.\nYet here you are.",
+  alex:"Time compounds.\nSo do friendships.",
+  ares:"Time compounds.\nSo do friendships.",
+  xia:"Stubborn as always.\nStill here."
 };
-
-document.getElementById("ending").innerText =
-  endings[name] ||
-  "If you found this,\nthen it was meant to be found.";
+document.getElementById("ending").innerText = endings[name] || "If you reached this,\nthen the archive wanted you here.";
 </script>
 
 </body>
