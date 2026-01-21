@@ -46,33 +46,32 @@ button.spoiler:hover { background: rgba(127,255,193,0.1); }
   animation: flickerOutline 1s ease-in-out;
 }
 
-/* Glitch flicker overlay */
-.flicker-overlay {
-  position:absolute;
-  top:0; left:0; right:0; bottom:0;
-  background:rgba(127,255,193,0.15);
-  pointer-events:none;
-  opacity:0;
-  z-index:2;
-  animation: flickerAnim 0.6s linear forwards;
-}
-@keyframes flickerAnim {
-  0% { opacity:0; }
-  10% { opacity:0.8; }
-  20% { opacity:0.2; }
-  30% { opacity:0.7; }
-  40% { opacity:0.3; }
-  50% { opacity:0.6; }
-  60% { opacity:0.4; }
-  70% { opacity:0.8; }
-  100% { opacity:0; }
-}
-
 @keyframes flickerOutline {
   0%,100% { box-shadow:0 0 4px rgba(127,255,193,0.3); }
   25% { box-shadow:0 0 12px rgba(127,255,193,0.6); }
   50% { box-shadow:0 0 8px rgba(127,255,193,0.5); }
   75% { box-shadow:0 0 10px rgba(127,255,193,0.55); }
+}
+
+/* Loading dots */
+.loading-dots {
+  color:#7fffc1;
+  font-weight:bold;
+  font-size:16px;
+  display:inline-block;
+  margin-bottom:8px;
+  height:1em;
+}
+@keyframes blinkDots {
+  0%,20% { opacity:0; }
+  40% { opacity:1; }
+  60% { opacity:0; }
+  80% { opacity:1; }
+  100% { opacity:0; }
+}
+.loading-dots span {
+  animation: blinkDots 1s infinite;
+  margin-right:2px;
 }
 
 .download { display:inline-block; margin-top:4px; padding:6px 12px; background:transparent; border:1px solid rgba(214,245,227,0.3); color:#d6f5e3; text-decoration:none; }
@@ -82,6 +81,7 @@ button.spoiler:hover { background: rgba(127,255,193,0.1); }
   margin-top:20px;
   min-height:4em;
   white-space:pre-line;
+  line-height:1.4em;
 }
 .glitch-letter { display:inline-block; animation: glitchChar 0.1s infinite; }
 @keyframes glitchChar {
@@ -103,7 +103,8 @@ button.spoiler:hover { background: rgba(127,255,193,0.1); }
   <h2>The Beginning</h2>
   <button class="spoiler" onclick="revealVideo('video1')">Reveal Video</button>
   <div class="video-wrapper" id="video1">
-    <iframe width="100%" height="400" src="https://www.youtube.com/embed/Mg0yid5vbRc" frameborder="0" allowfullscreen></iframe>
+    <div class="loading-dots" id="loading-video1"><span>.</span><span>.</span><span>.</span></div>
+    <iframe width="100%" height="400" src="https://www.youtube.com/embed/Mg0yid5vbRc" frameborder="0" allowfullscreen style="display:none;"></iframe>
     <a class="download" href="https://youtu.be/Mg0yid5vbRc" target="_blank">Download "The Beginning"</a>
   </div>
 </div>
@@ -112,7 +113,8 @@ button.spoiler:hover { background: rgba(127,255,193,0.1); }
   <h2>The Second Coming</h2>
   <button class="spoiler" onclick="revealVideo('video2')">Reveal Video</button>
   <div class="video-wrapper" id="video2">
-    <iframe width="100%" height="400" src="https://www.youtube.com/embed/V-EtXn2h3qA" frameborder="0" allowfullscreen></iframe>
+    <div class="loading-dots" id="loading-video2"><span>.</span><span>.</span><span>.</span></div>
+    <iframe width="100%" height="400" src="https://www.youtube.com/embed/V-EtXn2h3qA" frameborder="0" allowfullscreen style="display:none;"></iframe>
     <a class="download" href="https://youtu.be/V-EtXn2h3qA" target="_blank">Download "The Second Coming"</a>
   </div>
 </div>
@@ -121,7 +123,8 @@ button.spoiler:hover { background: rgba(127,255,193,0.1); }
   <h2>Uncharted Path</h2>
   <button class="spoiler" onclick="revealVideo('video3')">Reveal Video</button>
   <div class="video-wrapper" id="video3">
-    <iframe width="100%" height="400" src="https://www.youtube.com/embed/jknp7khNAbk" frameborder="0" allowfullscreen></iframe>
+    <div class="loading-dots" id="loading-video3"><span>.</span><span>.</span><span>.</span></div>
+    <iframe width="100%" height="400" src="https://www.youtube.com/embed/jknp7khNAbk" frameborder="0" allowfullscreen style="display:none;"></iframe>
     <a class="download" href="https://youtu.be/jknp7khNAbk" target="_blank">Download "Uncharted Path"</a>
   </div>
 </div>
@@ -130,7 +133,8 @@ button.spoiler:hover { background: rgba(127,255,193,0.1); }
   <h2>DELT4</h2>
   <button class="spoiler" onclick="revealVideo('video4')">Reveal Video</button>
   <div class="video-wrapper" id="video4">
-    <iframe width="100%" height="400" src="https://www.youtube.com/embed/CqmtTeHgO2E" frameborder="0" allowfullscreen></iframe>
+    <div class="loading-dots" id="loading-video4"><span>.</span><span>.</span><span>.</span></div>
+    <iframe width="100%" height="400" src="https://www.youtube.com/embed/CqmtTeHgO2E" frameborder="0" allowfullscreen style="display:none;"></iframe>
     <a class="download" href="https://youtu.be/CqmtTeHgO2E" target="_blank">Download "DELT4"</a>
   </div>
 </div>
@@ -139,7 +143,8 @@ button.spoiler:hover { background: rgba(127,255,193,0.1); }
   <h2>Last one. For now</h2>
   <button class="spoiler" onclick="revealVideo('video5')">Reveal Video</button>
   <div class="video-wrapper" id="video5">
-    <iframe width="100%" height="400" src="https://www.youtube.com/embed/KBoQu7vkF5A" frameborder="0" allowfullscreen></iframe>
+    <div class="loading-dots" id="loading-video5"><span>.</span><span>.</span><span>.</span></div>
+    <iframe width="100%" height="400" src="https://www.youtube.com/embed/KBoQu7vkF5A" frameborder="0" allowfullscreen style="display:none;"></iframe>
     <a class="download" href="https://youtu.be/KBoQu7vkF5A" target="_blank">Download "Last one. For now"</a>
   </div>
 </div>
@@ -148,7 +153,8 @@ button.spoiler:hover { background: rgba(127,255,193,0.1); }
   <h2>Work in Progress</h2>
   <button class="spoiler" onclick="revealVideo('video6')">Reveal Video</button>
   <div class="video-wrapper" id="video6">
-    <div style="width:100%;height:400px;background:#111;color:#ff4a4a;display:flex;align-items:center;justify-content:center;">
+    <div class="loading-dots" id="loading-video6"><span>.</span><span>.</span><span>.</span></div>
+    <div style="width:100%;height:400px;background:#111;color:#ff4a4a;display:flex;align-items:center;justify-content:center;display:none;">
       ERROR 404: Video not found
     </div>
   </div>
@@ -157,7 +163,6 @@ button.spoiler:hover { background: rgba(127,255,193,0.1); }
 </div>
 
 <script>
-// Personalized messages
 const personalMessages = {
   "mimi":["Hey Mimi! You know 88, you got this.","Radium would be proud.","Enjoy the archive <3"],
   "mie":["Hey Mimi! You know 88, you got this.","Radium would be proud.","Enjoy the archive <3"],
@@ -184,30 +189,30 @@ const personalMessages = {
   "mochi":["Mona! Strawberries are sweet.","Take it easy."]
 };
 
-// Reveal video with flicker
+// Reveal video with loading dots
 function revealVideo(id){
   const wrapper=document.getElementById(id);
-  const flicker=document.createElement("div");
-  flicker.className="flicker-overlay";
-  wrapper.appendChild(flicker);
+  const dots=wrapper.querySelector(".loading-dots");
+  const iframe=wrapper.querySelector("iframe") || wrapper.querySelector("div");
+  dots.style.display="inline-block";
   setTimeout(()=>{
+    dots.style.display="none";
+    iframe.style.display="block";
     wrapper.classList.add("reveal");
-    flicker.remove();
-  }, 600); // flicker duration
+  }, 800); // 0.8s loading animation
 }
 
-// Glitch letters
+// Show personalized messages
 function glitchLetters(text, container, index=0){
   if(index>=text.length) return;
-  const char = text[index]===" "? "\u00A0":text[index];
+  const char=text[index]===" "? "\u00A0":text[index];
   const span=document.createElement("span");
   span.className="glitch-letter";
   span.innerText=char;
   container.appendChild(span);
-  setTimeout(()=>glitchLetters(text,container,index+1),50+Math.random()*30);
+  setTimeout(()=>glitchLetters(text,container,index+1),40);
 }
 
-// Show personal messages
 function showPersonal(){
   const name=(localStorage.getItem("archive_name")||"").toLowerCase();
   const container=document.getElementById("personal");
@@ -219,7 +224,7 @@ function showPersonal(){
       glitchLetters(msg,container);
       container.appendChild(document.createElement("br"));
     }, delay);
-    delay += msg.length*60 + 200;
+    delay += msg.length*50 + 150;
   });
   document.getElementById("greeting").innerText="Welcome to the Archive!";
 }
