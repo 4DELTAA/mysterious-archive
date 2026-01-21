@@ -79,12 +79,18 @@ button:hover { background: rgba(127,255,193,0.12); cursor:pointer; }
   opacity: 0.6;
   font-size: 0.85em;
 }
+
+/* Glitchy letters effect */
+.glitch-letter {
+  display: inline-block;
+  animation: flicker 0.05s infinite;
+}
 </style>
 </head>
 <body>
 
 <div class="gate">
-  <h1>Identify Yourself</h1>
+  <h1 id="gateHeader">Identify Yourself</h1>
   <div id="text" class="text">Who’s trying to get in?</div>
 
   <input id="nameInput" placeholder="name or alias"><br><br>
@@ -112,6 +118,7 @@ const failMessages = [
 const textBox = document.getElementById("text");
 const errorBox = document.getElementById("error");
 const unlockBox = document.getElementById("unlock");
+const gateHeader = document.getElementById("gateHeader");
 
 const people = [
   { names:["mimi","mie","mieree","mierees"], lines:["You already know this.","It glows green.","You’ve heard me talk about it.","Is it really a word?"], hint:"you don’t need much help" },
@@ -119,18 +126,32 @@ const people = [
   { names:["aloise","aloises"], lines:["You know the number.","You know why.","Don’t overthink it."], hint:"trivial" },
   { names:["snoopy","n0op3e","isimira"], lines:["Beautiful.","Dangerous.","Science giveth.","Science taketh away."], hint:"hazard symbols exist" },
   { names:["leafeon","leafy","dorian"], lines:["Solve this:","(92 − 4) × 1","Modifiers applied."], hint:"INT: -4" },
-  { names:["glad","ggx2"], lines:["Not everything rare is fictional.","Some numbers are infamous."], hint:"not a gacha" },
+  { names:["glad","ggx2"], lines:["Not everything rare is fictional.","Some numbers matter."], hint:"simpler clues" },
   { names:["ares","alex"], lines:["Longer than most.","You’ve seen worse odds."], hint:"you’ve been here before" },
   { names:["xia","xixi","fearless nugget"], lines:["Short.","Stubborn.","Hard to reach.","Still counts."], hint:"availability not guaranteed" },
-  { names:["mona","mochi"], lines:["Strawberries.","A bit awkward.","Clueless sometimes.","Still curious."], hint:"sweet and hesitant" }
+  { names:["mona","mochi"], lines:["Strawberries are sweet.","Look carefully.","Don’t overthink it."], hint:"easy" }
 ];
 
 let matched = null;
 
-function typeLines(lines,i=0){
+function typeGlitchLetters(text, container, index=0){
+  if(index >= text.length) return;
+  const span = document.createElement("span");
+  span.className = "glitch-letter";
+  span.innerText = text[index];
+  container.appendChild(span);
+  setTimeout(()=>typeGlitchLetters(text, container, index+1), 60);
+}
+
+function typeLines(lines, i=0){
   if(i>=lines.length) return;
-  textBox.innerText += (i? "\n":"") + lines[i];
-  setTimeout(()=>typeLines(lines,i+1),900);
+  typeGlitchLetters(lines[i], textBox);
+  if(i+1<lines.length){
+    setTimeout(()=> {
+      textBox.appendChild(document.createElement("br"));
+      typeLines(lines, i+1);
+    }, lines[i].length*60 + 200);
+  }
 }
 
 function setName(){
@@ -142,7 +163,9 @@ function setName(){
   document.querySelector("button").style.display="none";
   document.getElementById("answerArea").style.display="block";
 
-  textBox.innerText="";
+  gateHeader.innerText = "Let’s see if you can unlock the archive…";
+
+  textBox.innerHTML="";
   if(matched){
     typeLines(matched.lines);
   } else {
