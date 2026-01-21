@@ -7,188 +7,113 @@
 
 <style>
 body {
-  background: #0f1110;
-  color: #d6f5e3;
-  font-family: "Courier New", monospace;
   margin:0;
+  font-family: "Courier New", monospace;
+  background:#0f1110;
+  color:#d6f5e3;
 }
-
-.container { max-width: 900px; margin:auto; padding:50px 20px; }
-
-h1 { text-align:center; color:#7fffc1; margin-bottom:60px; }
-
-.section {
-  margin-bottom:50px;
-  padding:20px;
-  border:1px dashed rgba(127,255,193,0.3);
-  background: rgba(10,14,12,0.9);
+.container {
+  max-width:800px;
+  margin:0 auto;
+  padding:40px 20px;
 }
-
-h2 { color:#9affc8; margin-bottom:12px; }
-
-.spoiler {
-  background: rgba(0,0,0,0.2);
-  padding:10px;
+h1 { text-align:center; color:#7fffc1; margin-bottom:40px; }
+.section { margin-bottom:40px; padding:20px; border:1px dashed rgba(127,255,193,0.3); background:rgba(15,17,16,0.85);}
+h2 { margin-bottom:12px; color:#9affc8; }
+button.spoiler {
+  display:inline-block;
+  margin-bottom:12px;
+  padding:6px 12px;
+  background:transparent;
+  border:1px solid rgba(214,245,227,0.3);
+  color:#d6f5e3;
   cursor:pointer;
-  text-align:center;
-  user-select:none;
-  overflow:hidden;
-  position: relative;
 }
-
-.spoiler iframe {
-  display:none;
-  margin-top:10px;
-  width:100%;
-  height:460px;
-  border:none;
-  opacity:0;
-  transition: opacity 1s ease-in-out;
+button.spoiler:hover { background: rgba(127,255,193,0.1); }
+.video-wrapper { display:none; position:relative; margin-bottom:16px; opacity:0; transition: opacity 1s ease-in-out; }
+.video-wrapper.reveal { display:block; opacity:1; border:2px solid rgba(127,255,193,0.3); box-shadow:0 0 8px rgba(127,255,193,0.5); animation: flickerOutline 1s ease-in-out;}
+@keyframes flickerOutline {
+  0%,100% { box-shadow:0 0 4px rgba(127,255,193,0.3); }
+  25% { box-shadow:0 0 12px rgba(127,255,193,0.6); }
+  50% { box-shadow:0 0 8px rgba(127,255,193,0.5); }
+  75% { box-shadow:0 0 10px rgba(127,255,193,0.55); }
 }
-
-.spoiler.glitch::after {
-  content: "▌▌▌";
-  position: absolute;
-  top: 5px; left: 10px;
-  color:#ff9a9a;
-  animation: flicker 0.1s infinite;
-}
-
-@keyframes flicker {
-  0%,100% {opacity:1;}
-  50% {opacity:0;}
-}
-
-.error-fake {
-  color:#ff6a6a;
-  font-weight:bold;
-  animation: glitch 0.2s infinite;
-}
-
-@keyframes glitch {
-  0% { transform: translate(0); }
-  25% { transform: translate(-1px,1px); }
-  50% { transform: translate(1px,-1px); }
-  75% { transform: translate(-1px,0); }
-  100% { transform: translate(0); }
-}
-
-.ending {
-  white-space: pre-line;
-  background: rgba(0,0,0,0.35);
-  padding:16px;
-  border-left:3px solid #7fffc1;
-}
-
-.footer { text-align:center; opacity:0.4; margin-top:70px; }
+.download { display:inline-block; margin-top:4px; padding:6px 12px; background:transparent; border:1px solid rgba(214,245,227,0.3); color:#d6f5e3; text-decoration:none; }
+.download:hover { background: rgba(127,255,193,0.1); }
 </style>
 </head>
 <body>
-
 <div class="container">
 <h1>Hidden Archive</h1>
 
+<!-- Video 1 -->
 <div class="section">
   <h2>The Beginning</h2>
-  <div class="spoiler" onclick="toggleSpoiler(this)">
-    Click to reveal
-    <iframe src="https://www.youtube.com/embed/Mg0yid5vbRc" allowfullscreen></iframe>
+  <button class="spoiler" onclick="reveal('video1')">Reveal Video</button>
+  <div class="video-wrapper" id="video1">
+    <iframe width="100%" height="400" src="https://www.youtube.com/embed/Mg0yid5vbRc" frameborder="0" allowfullscreen></iframe>
+    <a class="download" href="https://youtu.be/Mg0yid5vbRc" target="_blank">Download "The Beginning"</a>
   </div>
 </div>
 
+<!-- Video 2 -->
 <div class="section">
   <h2>The Second Coming</h2>
-  <div class="spoiler" onclick="toggleSpoiler(this)">
-    Click to reveal
-    <iframe src="https://www.youtube.com/embed/V-EtXn2h3qA" allowfullscreen></iframe>
+  <button class="spoiler" onclick="reveal('video2')">Reveal Video</button>
+  <div class="video-wrapper" id="video2">
+    <iframe width="100%" height="400" src="https://www.youtube.com/embed/V-EtXn2h3qA" frameborder="0" allowfullscreen></iframe>
+    <a class="download" href="https://youtu.be/V-EtXn2h3qA" target="_blank">Download "The Second Coming"</a>
   </div>
 </div>
 
+<!-- Video 3 -->
 <div class="section">
-  <h2>Residual Noise</h2>
-  <div class="spoiler" onclick="toggleSpoiler(this)">
-    Click to reveal
-    <iframe src="https://www.youtube.com/embed/jknp7khNAbk" allowfullscreen></iframe>
+  <h2>Uncharted Path</h2>
+  <button class="spoiler" onclick="reveal('video3')">Reveal Video</button>
+  <div class="video-wrapper" id="video3">
+    <iframe width="100%" height="400" src="https://www.youtube.com/embed/jknp7khNAbk" frameborder="0" allowfullscreen></iframe>
+    <a class="download" href="https://youtu.be/jknp7khNAbk" target="_blank">Download "Uncharted Path"</a>
   </div>
 </div>
 
+<!-- Video 4 -->
 <div class="section">
   <h2>DELT4</h2>
-  <div class="spoiler" onclick="toggleSpoiler(this)">
-    Click to reveal
-    <iframe src="https://www.youtube.com/embed/CqmtTeHgO2E" allowfullscreen></iframe>
+  <button class="spoiler" onclick="reveal('video4')">Reveal Video</button>
+  <div class="video-wrapper" id="video4">
+    <iframe width="100%" height="400" src="https://www.youtube.com/embed/CqmtTeHgO2E" frameborder="0" allowfullscreen></iframe>
+    <a class="download" href="https://youtu.be/CqmtTeHgO2E" target="_blank">Download "DELT4"</a>
   </div>
 </div>
 
+<!-- Video 5 -->
 <div class="section">
-  <h2>Last One. For Now</h2>
-  <div class="spoiler" onclick="toggleSpoiler(this)">
-    Click to reveal
-    <iframe src="https://www.youtube.com/embed/KBoQu7vkF5A" allowfullscreen></iframe>
+  <h2>Last one. For now</h2>
+  <button class="spoiler" onclick="reveal('video5')">Reveal Video</button>
+  <div class="video-wrapper" id="video5">
+    <iframe width="100%" height="400" src="https://www.youtube.com/embed/KBoQu7vkF5A" frameborder="0" allowfullscreen></iframe>
+    <a class="download" href="https://youtu.be/KBoQu7vkF5A" target="_blank">Download "Last one. For now"</a>
   </div>
 </div>
 
-<!-- Fake 6th video -->
+<!-- Fake Video 6 -->
 <div class="section">
   <h2>Work in Progress</h2>
-  <div class="spoiler" onclick="fakeVideo(this)">
-    Click to reveal
-    <div class="error-fake" style="display:none;">⚠ VIDEO CORRUPTED ⚠</div>
+  <button class="spoiler" onclick="reveal('video6')">Reveal Video</button>
+  <div class="video-wrapper" id="video6">
+    <div style="width:100%;height:400px;background:#111;color:#ff4a4a;display:flex;align-items:center;justify-content:center;">
+      ERROR 404: Video not found
+    </div>
   </div>
 </div>
 
-<div class="section">
-  <h2>Afterword</h2>
-  <div id="ending" class="ending">…</div>
-</div>
-
-<div class="footer">88</div>
 </div>
 
 <script>
-function toggleSpoiler(el){
-  const iframe = el.querySelector("iframe");
-  if(!iframe) return;
-  el.classList.add("glitch");
-  if(iframe.style.display === "block") {
-    iframe.style.display = "none";
-    iframe.style.opacity = 0;
-  } else {
-    iframe.style.display = "block";
-    setTimeout(()=>{ iframe.style.opacity = 1; }, 50);
-    setTimeout(()=>{ el.classList.remove("glitch"); }, 900); // glitch effect while fading
-  }
+function reveal(id){
+  const wrapper = document.getElementById(id);
+  wrapper.classList.add("reveal");
 }
-
-// Fake 6th video effect
-function fakeVideo(el){
-  const error = el.querySelector(".error-fake");
-  error.style.display = "block";
-  let flicker = 0;
-  const interval = setInterval(()=>{
-    error.style.opacity = flicker % 2 === 0 ? 1 : 0.3;
-    flicker++;
-    if(flicker > 12) clearInterval(interval);
-  },150);
-}
-
-// Personalized ending
-const name = (localStorage.getItem("archive_name") || "").toLowerCase();
-const endings = {
-  mimi:"You didn’t need proof.\nYou already knew.",
-  mie:"You didn’t need proof.\nYou already knew.",
-  saga:"Context matters.\nYou noticed.",
-  aloise:"Predictable.\nIn a good way.",
-  snoopy:"Curiosity can hurt.\nYou kept going anyway.",
-  dorian:"Statistically improbable.\nYet here you are.",
-  leafy:"Statistically improbable.\nYet here you are.",
-  alex:"Time compounds.\nSo do friendships.",
-  ares:"Time compounds.\nSo do friendships.",
-  xia:"Stubborn as always.\nStill here.",
-  mona:"Sweet and awkward.\nClues come eventually.",
-  mochi:"Sweet and awkward.\nClues come eventually."
-};
-document.getElementById("ending").innerText = endings[name] || "If you reached this,\nthen the archive wanted you here.";
 </script>
 
 </body>
