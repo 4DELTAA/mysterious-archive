@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nothing obvious here</title>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #0f1110;
+      color: #d6f5e3;
+      font-family: "Courier New", Courier, monospace;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .gate {
+      max-width: 520px;
+      padding: 32px;
+      border: 1px solid rgba(214, 245, 227, 0.2);
+      box-shadow: 0 0 20px rgba(0, 255, 150, 0.1);
+      background: rgba(15, 17, 16, 0.9);
+    }
+
+    .gate p {
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .gate p:last-of-type {
+      margin-bottom: 24px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      background: #050606;
+      border: 1px solid rgba(214, 245, 227, 0.3);
+      color: #d6f5e3;
+      font-family: inherit;
+      font-size: 16px;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #7fffc1;
+    }
+
+    button {
+      margin-top: 12px;
+      padding: 8px 14px;
+      background: transparent;
+      border: 1px solid rgba(214, 245, 227, 0.3);
+      color: #d6f5e3;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    button:hover {
+      background: rgba(127, 255, 193, 0.1);
+    }
+
+    .response {
+      margin-top: 16px;
+      min-height: 24px;
+      opacity: 0.85;
+    }
+
+    .reveal {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px dashed rgba(214, 245, 227, 0.3);
+      color: #9affc8;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="gate">
+    <p>I like this “word,” though it isn’t one.</p>
+    <p>My friends know it as my favorite number.</p>
+    <p>It glows green, but not for fun reasons.</p>
+    <p>You’ll find it on a table.</p>
+
+    <input id="answer" type="text" placeholder="say it" />
+    <button onclick="checkAnswer()">enter</button>
+
+    <div class="response" id="response"></div>
+
+    <div class="reveal hidden" id="reveal">
+      <p>Yeah.</p>
+      <p>That one.</p>
+      <p><strong>/88.html</strong></p>
+    </div>
+  </div>
+
+  <script>
+    const responses = [
+      "No, but I respect the confidence.",
+      "That glows differently.",
+      "Not wrong forever. Just wrong now.",
+      "Close? Emotionally? Hard to say.",
+      "I like how you arrived there, but no.",
+      "That number feels lonely.",
+      "Interesting guess. Incorrect universe."
+    ];
+
+    function checkAnswer() {
+      const input = document.getElementById("answer").value.trim().toLowerCase();
+      const responseEl = document.getElementById("response");
+      const revealEl = document.getElementById("reveal");
+
+      if (input === "88" || input === "radium") {
+        responseEl.textContent = "";
+        revealEl.classList.remove("hidden");
+      } else {
+        const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+        responseEl.textContent = randomResponse;
+      }
+    }
+  </script>
+</body>
+</html>
