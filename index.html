@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <title>Hidden Archive Gate</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
 body {
   margin: 0;
@@ -17,7 +16,6 @@ body {
   justify-content: center;
   overflow: hidden;
 }
-
 body::before {
   content: "";
   position: fixed;
@@ -29,41 +27,14 @@ body::before {
   animation: scan 6s linear infinite;
   pointer-events: none;
 }
+@keyframes scan { from {background-position:0 0;} to {background-position:0 100%;} }
 
-@keyframes scan {
-  from {background-position:0 0;}
-  to {background-position:0 100%;}
-}
-
-.gate {
-  max-width: 540px;
-  padding: 32px;
-  border: 1px dashed rgba(127,255,193,0.35);
-  background: rgba(8,14,10,0.92);
-  text-align: center;
-}
-
+.gate { max-width:540px; padding:32px; border:1px dashed rgba(127,255,193,0.35); background:rgba(8,14,10,0.92); text-align:center; }
 h1 { color:#7fffc1; }
-
 .text { white-space: pre-line; min-height:6em; margin:20px 0; }
-
-input, button {
-  background: black;
-  color: #d6f5e3;
-  border: 1px solid rgba(214,245,227,0.3);
-  padding: 8px;
-  font-family: inherit;
-}
-
+input, button { background:black; color:#d6f5e3; border:1px solid rgba(214,245,227,0.3); padding:8px; font-family:inherit; }
 button:hover { background: rgba(127,255,193,0.12); cursor:pointer; }
-
-.error {
-  margin-top: 14px;
-  color: #ff9a9a;
-  display: none;
-  animation: glitch 0.3s infinite;
-}
-
+.error { margin-top:14px; color:#ff9a9a; display:none; animation: glitch 0.3s infinite; }
 @keyframes glitch {
   0% { transform: translate(0); }
   25% { transform: translate(-1px,1px); }
@@ -71,33 +42,22 @@ button:hover { background: rgba(127,255,193,0.12); cursor:pointer; }
   75% { transform: translate(-1px,0); }
   100% { transform: translate(0); }
 }
+.unlock { display:none; margin-top:18px; color:#9affc8; opacity:0.6; font-size:0.85em; }
 
-.unlock {
-  display: none;
-  margin-top: 18px;
-  color: #9affc8;
-  opacity: 0.6;
-  font-size: 0.85em;
-}
-
-/* Glitchy letters effect with RGB split + shake */
 .glitch-letter {
-  display: inline-block;
-  position: relative;
+  display:inline-block; position:relative;
   animation: glitchChar 0.1s infinite;
 }
-
 @keyframes glitchChar {
-  0% { transform: translate(0,0); color:#d6f5e3; text-shadow:none;}
-  25% { transform: translate(-1px,1px); color:#9affc8; text-shadow:1px 0 #ff9a9a;}
-  50% { transform: translate(1px,-1px); color:#7fffc1; text-shadow:-1px 0 #ff9a9a,1px 0 #ff9a9a;}
-  75% { transform: translate(-1px,0); color:#d6f5e3; text-shadow:1px 0 #ff9a9a,-1px 0 #9affc8;}
-  100% { transform: translate(0,0); color:#d6f5e3; text-shadow:none;}
+  0% { transform:translate(0,0); color:#d6f5e3; text-shadow:none;}
+  25% { transform:translate(-1px,1px); color:#9affc8; text-shadow:1px 0 #ff9a9a;}
+  50% { transform:translate(1px,-1px); color:#7fffc1; text-shadow:-1px 0 #ff9a9a,1px 0 #ff9a9a;}
+  75% { transform:translate(-1px,0); color:#d6f5e3; text-shadow:1px 0 #ff9a9a,-1px 0 #9affc8;}
+  100% { transform:translate(0,0); color:#d6f5e3; text-shadow:none;}
 }
 </style>
 </head>
 <body>
-
 <div class="gate">
   <h1 id="gateHeader">Identify Yourself</h1>
   <div id="text" class="text">Who’s trying to get in?</div>
@@ -111,113 +71,89 @@ button:hover { background: rgba(127,255,193,0.12); cursor:pointer; }
   </div>
 
   <div id="error" class="error"></div>
-  <div id="unlock" class="unlock">
-    Something loosened.<br>Even mistakes can open doors.
-  </div>
+  <div id="unlock" class="unlock">Something loosened.<br>Even mistakes can open doors.</div>
 </div>
 
 <script>
-const correct = "88";
-let failures = 0;
-const failMessages = [
-  "Incorrect.","No.","Still not it.","You’re circling it.",
-  "You already know this.","Stop guessing.","This isn’t random.","Last warning."
+const correct="88"; let failures=0;
+const failMessages=["Incorrect.","No.","Still not it.","You’re circling it.","You already know this.","Stop guessing.","This isn’t random.","Last warning."];
+
+const textBox=document.getElementById("text");
+const errorBox=document.getElementById("error");
+const unlockBox=document.getElementById("unlock");
+const gateHeader=document.getElementById("gateHeader");
+
+const people=[
+  {names:["mimi","mie","mieree","mierees"], lines:["You already know this.","It glows green.","You’ve heard me talk about it.","Is it really a word?"], hint:"you don’t need much help"},
+  {names:["saga","snagz_zz"], lines:["Recently relevant.","Radioactive.","Numbered.","Quietly famous."], hint:"school helps sometimes"},
+  {names:["aloise","aloises"], lines:["You know the number.","You know why.","Don’t overthink it."], hint:"trivial"},
+  {names:["snoopy","n0op3e","isimira"], lines:["Beautiful.","Dangerous.","Science giveth.","Science taketh away."], hint:"hazard symbols exist"},
+  {names:["leafeon","leafy","dorian"], lines:["Solve this:","(92 − 4) × 1","Modifiers applied."], hint:"INT: -4"},
+  {names:["glad","ggx2"], lines:["Not everything rare is fictional.","Some numbers matter."], hint:"simpler clues"},
+  {names:["ares","alex"], lines:["Longer than most.","You’ve seen worse odds."], hint:"you’ve been here before"},
+  {names:["xia","xixi","fearless nugget"], lines:["Short.","Stubborn.","Hard to reach.","Still counts."], hint:"availability not guaranteed"},
+  {names:["mona","mochi"], lines:["Strawberries are sweet.","Look carefully.","Don’t overthink it."], hint:"easy"}
 ];
+let matched=null;
 
-const textBox = document.getElementById("text");
-const errorBox = document.getElementById("error");
-const unlockBox = document.getElementById("unlock");
-const gateHeader = document.getElementById("gateHeader");
-
-const people = [
-  { names:["mimi","mie","mieree","mierees"], lines:["You already know this.","It glows green.","You’ve heard me talk about it.","Is it really a word?"], hint:"you don’t need much help" },
-  { names:["saga","snagz_zz"], lines:["Recently relevant.","Radioactive.","Numbered.","Quietly famous."], hint:"school helps sometimes" },
-  { names:["aloise","aloises"], lines:["You know the number.","You know why.","Don’t overthink it."], hint:"trivial" },
-  { names:["snoopy","n0op3e","isimira"], lines:["Beautiful.","Dangerous.","Science giveth.","Science taketh away."], hint:"hazard symbols exist" },
-  { names:["leafeon","leafy","dorian"], lines:["Solve this:","(92 − 4) × 1","Modifiers applied."], hint:"INT: -4" },
-  { names:["glad","ggx2"], lines:["Not everything rare is fictional.","Some numbers matter."], hint:"simpler clues" },
-  { names:["ares","alex"], lines:["Longer than most.","You’ve seen worse odds."], hint:"you’ve been here before" },
-  { names:["xia","xixi","fearless nugget"], lines:["Short.","Stubborn.","Hard to reach.","Still counts."], hint:"availability not guaranteed" },
-  { names:["mona","mochi"], lines:["Strawberries are sweet.","Look carefully.","Don’t overthink it."], hint:"easy" }
-];
-
-let matched = null;
-
-// Glitchy letter reveal
-function typeGlitchLetters(text, container, index=0){
-  if(index >= text.length) return;
-  const span = document.createElement("span");
-  span.className = "glitch-letter";
-  span.innerText = text[index];
+// glitchy letters including spaces
+function typeGlitchLetters(text,container,index=0){
+  if(index>=text.length) return;
+  const char = text[index]===" " ? "\u00A0" : text[index];
+  const span=document.createElement("span");
+  span.className="glitch-letter";
+  span.innerText=char;
   container.appendChild(span);
-  setTimeout(()=>typeGlitchLetters(text, container, index+1), 50 + Math.random()*30); // slight randomization for glitch
+  setTimeout(()=>typeGlitchLetters(text,container,index+1),50+Math.random()*30);
 }
 
-function typeLines(lines, i=0){
+function typeLines(lines,i=0){
   if(i>=lines.length) return;
-  typeGlitchLetters(lines[i], textBox);
+  typeGlitchLetters(lines[i],textBox);
   if(i+1<lines.length){
-    setTimeout(()=> {
+    setTimeout(()=>{
       textBox.appendChild(document.createElement("br"));
-      typeLines(lines, i+1);
-    }, lines[i].length*60 + 200);
+      typeLines(lines,i+1);
+    },lines[i].length*60+200);
   }
 }
 
-// Self-destruct effect for your name
 function selfDestruct(){
-  document.body.innerHTML = "";
-  const msg = document.createElement("div");
-  msg.style.color = "#ff4a4a";
-  msg.style.fontFamily = "Courier New, monospace";
-  msg.style.fontSize = "2em";
-  msg.style.textAlign = "center";
-  msg.style.marginTop = "40vh";
-  msg.innerText = "ACCESS DENIED\nARCHIVE DESTROYED";
+  document.body.innerHTML="";
+  const msg=document.createElement("div");
+  msg.style.color="#ff4a4a";
+  msg.style.fontFamily="Courier New, monospace";
+  msg.style.fontSize="2em";
+  msg.style.textAlign="center";
+  msg.style.marginTop="40vh";
+  msg.innerText="ACCESS DENIED\nARCHIVE DESTROYED";
   document.body.appendChild(msg);
 }
 
 function setName(){
-  const name = document.getElementById("nameInput").value.toLowerCase().trim();
-  
-  if(["delta","napper"].includes(name)){
-    selfDestruct();
-    return;
-  }
-
-  localStorage.setItem("archive_name", name);
-  matched = people.find(p=>p.names.includes(name));
-
+  const name=document.getElementById("nameInput").value.toLowerCase().trim();
+  if(["delta","napper"].includes(name)){selfDestruct(); return;}
+  localStorage.setItem("archive_name",name);
+  matched=people.find(p=>p.names.includes(name));
   document.getElementById("nameInput").style.display="none";
   document.querySelector("button").style.display="none";
   document.getElementById("answerArea").style.display="block";
-
-  gateHeader.innerText = "Let’s see if you can unlock the archive…";
-
+  gateHeader.innerText="Let’s see if you can unlock the archive…";
   textBox.innerHTML="";
-  if(matched){
-    typeLines(matched.lines);
-  } else {
-    typeLines(["The creator favors something.","It radiates.","It sits among elements.","Is it really a word?"]);
-  }
+  if(matched){typeLines(matched.lines);}
+  else{typeLines(["The creator favors something.","It radiates.","It sits among elements.","Is it really a word?"]);}
 }
 
 function checkAnswer(){
-  const val = document.getElementById("answerInput").value.trim();
-  if(val===correct){
-    window.location.href="88.html";
-    return;
-  }
-
+  const val=document.getElementById("answerInput").value.trim();
+  if(val===correct){window.location.href="88.html"; return;}
   failures++;
   errorBox.style.display="block";
-  errorBox.innerText = failMessages[Math.min(failures-1, failMessages.length-1)];
-
+  errorBox.innerText=failMessages[Math.min(failures-1,failMessages.length-1)];
   if(failures===5) unlockBox.style.display="block";
   if(failures>=8) errorBox.innerText="ARCHIVE CORRUPTED\nACCESS DEGRADED";
   if(failures>=10) window.location.href="88.html";
 }
 </script>
-
 </body>
 </html>
