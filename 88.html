@@ -30,10 +30,12 @@ button.spoiler {
   cursor:pointer;
 }
 button.spoiler:hover { background: rgba(127,255,193,0.1); }
+
 .video-wrapper {
   opacity:0;
   height:0;
   overflow:hidden;
+  position:relative;
   transition: opacity 1s ease-in-out, height 1s ease-in-out;
 }
 .video-wrapper.reveal {
@@ -43,12 +45,36 @@ button.spoiler:hover { background: rgba(127,255,193,0.1); }
   box-shadow:0 0 8px rgba(127,255,193,0.5);
   animation: flickerOutline 1s ease-in-out;
 }
+
+/* Glitch flicker overlay */
+.flicker-overlay {
+  position:absolute;
+  top:0; left:0; right:0; bottom:0;
+  background:rgba(127,255,193,0.15);
+  pointer-events:none;
+  opacity:0;
+  z-index:2;
+  animation: flickerAnim 0.6s linear forwards;
+}
+@keyframes flickerAnim {
+  0% { opacity:0; }
+  10% { opacity:0.8; }
+  20% { opacity:0.2; }
+  30% { opacity:0.7; }
+  40% { opacity:0.3; }
+  50% { opacity:0.6; }
+  60% { opacity:0.4; }
+  70% { opacity:0.8; }
+  100% { opacity:0; }
+}
+
 @keyframes flickerOutline {
   0%,100% { box-shadow:0 0 4px rgba(127,255,193,0.3); }
   25% { box-shadow:0 0 12px rgba(127,255,193,0.6); }
   50% { box-shadow:0 0 8px rgba(127,255,193,0.5); }
   75% { box-shadow:0 0 10px rgba(127,255,193,0.55); }
 }
+
 .download { display:inline-block; margin-top:4px; padding:6px 12px; background:transparent; border:1px solid rgba(214,245,227,0.3); color:#d6f5e3; text-decoration:none; }
 .download:hover { background: rgba(127,255,193,0.1); }
 
@@ -158,13 +184,19 @@ const personalMessages = {
   "mochi":["Mona! Strawberries are sweet.","Take it easy."]
 };
 
-// Reveal video (simplified)
+// Reveal video with flicker
 function revealVideo(id){
-  const wrapper = document.getElementById(id);
-  wrapper.classList.add("reveal");
+  const wrapper=document.getElementById(id);
+  const flicker=document.createElement("div");
+  flicker.className="flicker-overlay";
+  wrapper.appendChild(flicker);
+  setTimeout(()=>{
+    wrapper.classList.add("reveal");
+    flicker.remove();
+  }, 600); // flicker duration
 }
 
-// Glitch letter animation
+// Glitch letters
 function glitchLetters(text, container, index=0){
   if(index>=text.length) return;
   const char = text[index]===" "? "\u00A0":text[index];
@@ -175,7 +207,7 @@ function glitchLetters(text, container, index=0){
   setTimeout(()=>glitchLetters(text,container,index+1),50+Math.random()*30);
 }
 
-// Show personalized messages
+// Show personal messages
 function showPersonal(){
   const name=(localStorage.getItem("archive_name")||"").toLowerCase();
   const container=document.getElementById("personal");
