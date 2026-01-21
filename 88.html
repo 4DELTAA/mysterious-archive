@@ -41,17 +41,12 @@
     p {
       line-height: 1.6;
       margin-bottom: 12px;
-    }
-
-    video {
-      width: 100%;
-      max-height: 400px;
-      background: black;
-      margin-bottom: 8px;
+      opacity: 0.9;
     }
 
     .download {
       display: inline-block;
+      margin-right: 10px;
       margin-bottom: 12px;
       padding: 6px 12px;
       background: transparent;
@@ -72,42 +67,33 @@
       border-left: 3px solid #7fffc1;
       white-space: pre-wrap;
     }
-
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Hidden Archive</h1>
 
-    <!-- Video Section -->
     <div class="section">
       <h2>Video 1: Something Weird</h2>
-      <video controls>
-        <source src="https://drive.google.com/uc?export=download&id=1ANWtqcPOVmiJAUiVfFB5kBpR_9HNhZFP" type="video/mp4">
-        Your browser does not support the video tag.
-      </video>
-      <a class="download" href="https://drive.google.com/uc?export=download&id=1ANWtqcPOVmiJAUiVfFB5kBpR_9HNhZFP" download>Download Video 1</a>
+      <p>This one is better watched deliberately.</p>
+      <a class="download" href="https://drive.google.com/file/d/1ANWtqcPOVmiJAUiVfFB5kBpR_9HNhZFP/view" target="_blank">Play on Drive</a>
+      <a class="download" href="https://drive.google.com/uc?export=download&id=1ANWtqcPOVmiJAUiVfFB5kBpR_9HNhZFP" download>Download</a>
     </div>
 
     <div class="section">
       <h2>Video 2: Silly Moment</h2>
-      <video controls>
-        <source src="https://drive.google.com/uc?export=download&id=1Ec6XAJE2yVbXxLHW_7CQovcvPSYbFwLU" type="video/mp4">
-        Your browser does not support the video tag.
-      </video>
-      <a class="download" href="https://drive.google.com/uc?export=download&id=1Ec6XAJE2yVbXxLHW_7CQovcvPSYbFwLU" download>Download" Video 2</a>
+      <p>Context will not be provided.</p>
+      <a class="download" href="https://drive.google.com/file/d/1Ec6XAJE2yVbXxLHW_7CQovcvPSYbFwLU/view" target="_blank">Play on Drive</a>
+      <a class="download" href="https://drive.google.com/uc?export=download&id=1Ec6XAJE2yVbXxLHW_7CQovcvPSYbFwLU" download>Download</a>
     </div>
 
-    <!-- Text Section -->
     <div class="section">
       <h2>Text Notes</h2>
       <div class="text-file">
-        Here is some text you can keep secret. Maybe jokes, maybe nonsense. Whatever you want your friends to read.
+        Here is some text you can keep secret. Maybe jokes, maybe nonsense.
       </div>
-      <a class="download" href="https://drive.google.com/uc?export=downloaded&id=1gQ9V_kvluKkNKaMoP7JZfLto80w_4Wdu" download>Download Text File</a>
+      <a class="download" href="https://drive.google.com/uc?export=download&id=1gQ9V_kvluKkNKaMoP7JZfLto80w_4Wdu" download>Download Text File</a>
     </div>
-
-    <!-- Additional sections can be duplicated below -->
   </div>
 </body>
 </html>
