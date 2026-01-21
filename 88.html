@@ -8,7 +8,7 @@
 <style>
 body {
   margin:0;
-  font-family: "Courier New", monospace;
+  font-family:"Courier New", monospace;
   background:#0f1110;
   color:#d6f5e3;
 }
@@ -30,8 +30,20 @@ button.spoiler {
   cursor:pointer;
 }
 button.spoiler:hover { background: rgba(127,255,193,0.1); }
-.video-wrapper { display:none; position:relative; margin-bottom:16px; opacity:0; transition: opacity 1s ease-in-out; }
-.video-wrapper.reveal { display:block; opacity:1; border:2px solid rgba(127,255,193,0.3); box-shadow:0 0 8px rgba(127,255,193,0.5); animation: flickerOutline 1s ease-in-out;}
+.video-wrapper {
+  display:none;
+  position:relative;
+  margin-bottom:16px;
+  opacity:0;
+  transition: opacity 1s ease-in-out;
+}
+.video-wrapper.reveal {
+  display:block;
+  opacity:1;
+  border:2px solid rgba(127,255,193,0.3);
+  box-shadow:0 0 8px rgba(127,255,193,0.5);
+  animation: flickerOutline 1s ease-in-out;
+}
 @keyframes flickerOutline {
   0%,100% { box-shadow:0 0 4px rgba(127,255,193,0.3); }
   25% { box-shadow:0 0 12px rgba(127,255,193,0.6); }
@@ -40,13 +52,28 @@ button.spoiler:hover { background: rgba(127,255,193,0.1); }
 }
 .download { display:inline-block; margin-top:4px; padding:6px 12px; background:transparent; border:1px solid rgba(214,245,227,0.3); color:#d6f5e3; text-decoration:none; }
 .download:hover { background: rgba(127,255,193,0.1); }
+
+.personal-text {
+  margin-top:20px;
+  min-height:4em;
+  white-space:pre-line;
+}
+.glitch-letter { display:inline-block; animation: glitchChar 0.1s infinite; }
+@keyframes glitchChar {
+  0% { transform:translate(0,0); color:#d6f5e3; text-shadow:none;}
+  25% { transform:translate(-1px,1px); color:#9affc8; text-shadow:1px 0 #ff9a9a;}
+  50% { transform:translate(1px,-1px); color:#7fffc1; text-shadow:-1px 0 #ff9a9a,1px 0 #ff9a9a;}
+  75% { transform:translate(-1px,0); color:#d6f5e3; text-shadow:1px 0 #ff9a9a,-1px 0 #9affc8;}
+  100% { transform:translate(0,0); color:#d6f5e3; text-shadow:none;}
+}
 </style>
 </head>
 <body>
 <div class="container">
-<h1>Hidden Archive</h1>
+<h1 id="greeting">Hidden Archive</h1>
+<div id="personal" class="personal-text"></div>
 
-<!-- Video 1 -->
+<!-- Video Sections -->
 <div class="section">
   <h2>The Beginning</h2>
   <button class="spoiler" onclick="reveal('video1')">Reveal Video</button>
@@ -56,7 +83,6 @@ button.spoiler:hover { background: rgba(127,255,193,0.1); }
   </div>
 </div>
 
-<!-- Video 2 -->
 <div class="section">
   <h2>The Second Coming</h2>
   <button class="spoiler" onclick="reveal('video2')">Reveal Video</button>
@@ -66,7 +92,6 @@ button.spoiler:hover { background: rgba(127,255,193,0.1); }
   </div>
 </div>
 
-<!-- Video 3 -->
 <div class="section">
   <h2>Uncharted Path</h2>
   <button class="spoiler" onclick="reveal('video3')">Reveal Video</button>
@@ -76,7 +101,6 @@ button.spoiler:hover { background: rgba(127,255,193,0.1); }
   </div>
 </div>
 
-<!-- Video 4 -->
 <div class="section">
   <h2>DELT4</h2>
   <button class="spoiler" onclick="reveal('video4')">Reveal Video</button>
@@ -86,7 +110,6 @@ button.spoiler:hover { background: rgba(127,255,193,0.1); }
   </div>
 </div>
 
-<!-- Video 5 -->
 <div class="section">
   <h2>Last one. For now</h2>
   <button class="spoiler" onclick="reveal('video5')">Reveal Video</button>
@@ -96,7 +119,6 @@ button.spoiler:hover { background: rgba(127,255,193,0.1); }
   </div>
 </div>
 
-<!-- Fake Video 6 -->
 <div class="section">
   <h2>Work in Progress</h2>
   <button class="spoiler" onclick="reveal('video6')">Reveal Video</button>
@@ -110,11 +132,60 @@ button.spoiler:hover { background: rgba(127,255,193,0.1); }
 </div>
 
 <script>
-function reveal(id){
-  const wrapper = document.getElementById(id);
-  wrapper.classList.add("reveal");
-}
-</script>
+const personalMessages = {
+  "mimi":["Hey Mimi! You know 88, you got this.","Radium would be proud.","Enjoy the archive <3"],
+  "mie":["Hey Mimi! You know 88, you got this.","Radium would be proud.","Enjoy the archive <3"],
+  "mieree":["Hey Mimi! You know 88, you got this.","Radium would be proud.","Enjoy the archive <3"],
+  "mierees":["Hey Mimi! You know 88, you got this.","Radium would be proud.","Enjoy the archive <3"],
+  "saga":["Hello Saga! Check this out carefully.","Your studies helped.","Number 88 again!"],
+  "snagz_zz":["Hello Saga! Check this out carefully.","Your studies helped.","Number 88 again!"],
+  "aloise":["Aloise! The number 88 welcomes you.","Enjoy your exploration."],
+  "aloises":["Aloise! The number 88 welcomes you.","Enjoy your exploration."],
+  "snoopy":["Snoopy! Watch out, radium is dangerous.","Stay safe, scientist."],
+  "n0op3e":["Snoopy! Watch out, radium is dangerous.","Stay safe, scientist."],
+  "isimira":["Snoopy! Watch out, radium is dangerous.","Stay safe, scientist."],
+  "leafeon":["Leafy, -4 intelligence? Math is tricky!","Try your best!"],
+  "leafy":["Leafy, -4 intelligence? Math is tricky!","Try your best!"],
+  "dorian":["Leafy, -4 intelligence? Math is tricky!","Try your best!"],
+  "glad":["Glad! Don’t overthink, enjoy."],
+  "ggx2":["Glad! Don’t overthink, enjoy."],
+  "ares":["Ares! Longtime friend, here’s the archive."],
+  "alex":["Ares! Longtime friend, here’s the archive."],
+  "xia":["Xia! You’re short but mighty.","Good luck viewing."],
+  "xixi":["Xia! You’re short but mighty.","Good luck viewing."],
+  "fearless nugget":["Xia! You’re short but mighty.","Good luck viewing."],
+  "mona":["Mona! Strawberries are sweet.","Take it easy."],
+  "mochi":["Mona! Strawberries are sweet.","Take it easy."]
+};
 
+function revealVideo(id){
+  document.getElementById(id).classList.add("reveal");
+}
+
+function glitchLetters(text, container, index=0){
+  if(index>=text.length) return;
+  const char = text[index]===" "? "\u00A0":text[index];
+  const span=document.createElement("span");
+  span.className="glitch-letter";
+  span.innerText=char;
+  container.appendChild(span);
+  setTimeout(()=>glitchLetters(text,container,index+1),50+Math.random()*30);
+}
+
+function showPersonal(){
+  const name = (localStorage.getItem("archive_name")||"").toLowerCase();
+  const container = document.getElementById("personal");
+  container.innerHTML="";
+  let messages = personalMessages[name]||["Welcome, guest.","Enjoy the hidden archive."];
+  let delay = 0;
+  messages.forEach(msg=>{
+    setTimeout(()=>{ glitchLetters(msg,container); container.appendChild(document.createElement("br")); }, delay);
+    delay += msg.length*60 + 200;
+  });
+  document.getElementById("greeting").innerText="Welcome to the Archive!";
+}
+
+window.onload = showPersonal;
+</script>
 </body>
 </html>
