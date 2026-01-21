@@ -1,209 +1,169 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>?</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Hidden Archive Gate</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    body {
-      margin: 0;
-      height: 100vh;
-      background: radial-gradient(circle at center, #121614, #080a09);
-      color: #d6f5e3;
-      font-family: "Courier New", monospace;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
+<style>
+body {
+  margin: 0;
+  height: 100vh;
+  background: radial-gradient(circle, #121614, #070908);
+  color: #d6f5e3;
+  font-family: "Courier New", monospace;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
 
-    /* scanlines */
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background: repeating-linear-gradient(
-        to bottom,
-        rgba(255,255,255,0.03),
-        rgba(255,255,255,0.03) 1px,
-        transparent 1px,
-        transparent 3px
-      );
-      pointer-events: none;
-      animation: scan 6s linear infinite;
-    }
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(to bottom,
+    rgba(255,255,255,0.035), rgba(255,255,255,0.035) 1px,
+    transparent 1px, transparent 3px
+  );
+  animation: scan 6s linear infinite;
+  pointer-events: none;
+}
 
-    @keyframes scan {
-      from { background-position: 0 0; }
-      to { background-position: 0 100%; }
-    }
+@keyframes scan {
+  from {background-position:0 0;}
+  to {background-position:0 100%;}
+}
 
-    .gate {
-      max-width: 520px;
-      padding: 30px;
-      border: 1px dashed rgba(127,255,193,0.35);
-      background: rgba(10,14,12,0.9);
-      text-align: center;
-      box-shadow: 0 0 18px rgba(127,255,193,0.12);
-    }
+.gate {
+  max-width: 540px;
+  padding: 32px;
+  border: 1px dashed rgba(127,255,193,0.35);
+  background: rgba(8,14,10,0.92);
+  text-align: center;
+}
 
-    h1 {
-      color: #7fffc1;
-      margin-bottom: 16px;
-    }
+h1 { color:#7fffc1; }
 
-    .text {
-      white-space: pre-line;
-      min-height: 6em;
-      line-height: 1.6;
-      margin-bottom: 16px;
-    }
+.text { white-space: pre-line; min-height:6em; margin:20px 0; }
 
-    input, button {
-      font-family: inherit;
-      background: black;
-      color: #d6f5e3;
-      border: 1px solid rgba(214,245,227,0.3);
-      padding: 8px;
-      margin-top: 8px;
-    }
+input, button {
+  background: black;
+  color: #d6f5e3;
+  border: 1px solid rgba(214,245,227,0.3);
+  padding: 8px;
+  font-family: inherit;
+}
 
-    button:hover {
-      background: rgba(127,255,193,0.12);
-      cursor: pointer;
-    }
+button:hover { background: rgba(127,255,193,0.12); cursor:pointer; }
 
-    .error {
-      color: #ff9a9a;
-      margin-top: 12px;
-      display: none;
-      animation: glitch 0.3s infinite;
-    }
+.error {
+  margin-top: 14px;
+  color: #ff9a9a;
+  display: none;
+  animation: glitch 0.3s infinite;
+}
 
-    @keyframes glitch {
-      0% { transform: translate(0); }
-      20% { transform: translate(-1px, 1px); }
-      40% { transform: translate(1px, -1px); }
-      60% { transform: translate(-1px, 0); }
-      80% { transform: translate(1px, 1px); }
-      100% { transform: translate(0); }
-    }
+@keyframes glitch {
+  0% { transform: translate(0); }
+  25% { transform: translate(-1px,1px); }
+  50% { transform: translate(1px,-1px); }
+  75% { transform: translate(-1px,0); }
+  100% { transform: translate(0); }
+}
 
-    .hint {
-      opacity: 0.45;
-      font-size: 0.8em;
-      margin-top: 12px;
-    }
-  </style>
+.unlock {
+  display: none;
+  margin-top: 18px;
+  color: #9affc8;
+  opacity: 0.6;
+  font-size: 0.85em;
+}
+</style>
 </head>
 <body>
 
 <div class="gate">
-  <h1 id="title">Identify Yourself</h1>
+  <h1>Identify Yourself</h1>
   <div id="text" class="text">Who’s trying to get in?</div>
 
-  <input id="nameInput" placeholder="name or alias">
-  <br>
+  <input id="nameInput" placeholder="name or alias"><br><br>
   <button onclick="setName()">Continue</button>
 
-  <input id="answerInput" placeholder="answer" style="display:none;">
-  <br>
-  <button id="enterBtn" onclick="checkAnswer()" style="display:none;">Enter</button>
+  <div id="answerArea" style="display:none;">
+    <input id="answerInput" placeholder="answer"><br><br>
+    <button onclick="checkAnswer()">Enter</button>
+  </div>
 
   <div id="error" class="error"></div>
-  <div id="hint" class="hint"></div>
+  <div id="unlock" class="unlock">
+    Something loosened.<br>Even mistakes can open doors.
+  </div>
 </div>
 
 <script>
-const expected = "88";
+const correct = "88";
+let failures = 0;
+const failMessages = [
+  "Incorrect.","No.","Still not it.","You’re circling it.",
+  "You already know this.","Stop guessing.","This isn’t random.","Last warning."
+];
+
 const textBox = document.getElementById("text");
 const errorBox = document.getElementById("error");
+const unlockBox = document.getElementById("unlock");
 
+// Personalized lines for each person
 const people = [
-  { names:["mimi","mie","mieree","mierees"],
-    lines:["You already know this.","It glows green.","You’ve heard me talk about it.","Is it really a word?"],
-    hint:"you don’t need much help"
-  },
-  { names:["saga","snagz_zz"],
-    lines:["Recently relevant.","Radioactive.","Numbered.","Quietly famous."],
-    hint:"school helps sometimes"
-  },
-  { names:["aloise","aloises"],
-    lines:["You know the number.","You know why.","Don’t overthink it."],
-    hint:"trivial"
-  },
-  { names:["snoopy","n0op3e","isimira"],
-    lines:["Beautiful.","Dangerous.","Science giveth.","Science taketh away."],
-    hint:"hazard symbols exist"
-  },
-  { names:["leafeon","leafy","dorian"],
-    lines:["Solve this:","(92 − 4) × 1","Modifiers applied."],
-    hint:"INT: -4"
-  },
-  { names:["glad","ggx2"],
-    lines:["Not everything rare is fictional.","Some numbers are infamous."],
-    hint:"not a gacha"
-  },
-  { names:["ares","alex"],
-    lines:["Longer than most.","You’ve seen worse odds."],
-    hint:"you’ve been here before"
-  },
-  { names:["xia","xixi","fearless nugget"],
-    lines:["Short.","Stubborn.","Hard to reach.","Still counts."],
-    hint:"availability not guaranteed"
-  }
+  { names:["mimi","mie","mieree","mierees"], lines:["You already know this.","It glows green.","You’ve heard me talk about it.","Is it really a word?"], hint:"you don’t need much help" },
+  { names:["saga","snagz_zz"], lines:["Recently relevant.","Radioactive.","Numbered.","Quietly famous."], hint:"school helps sometimes" },
+  { names:["aloise","aloises"], lines:["You know the number.","You know why.","Don’t overthink it."], hint:"trivial" },
+  { names:["snoopy","n0op3e","isimira"], lines:["Beautiful.","Dangerous.","Science giveth.","Science taketh away."], hint:"hazard symbols exist" },
+  { names:["leafeon","leafy","dorian"], lines:["Solve this:","(92 − 4) × 1","Modifiers applied."], hint:"INT: -4" },
+  { names:["glad","ggx2"], lines:["Not everything rare is fictional.","Some numbers are infamous."], hint:"not a gacha" },
+  { names:["ares","alex"], lines:["Longer than most.","You’ve seen worse odds."], hint:"you’ve been here before" },
+  { names:["xia","xixi","fearless nugget"], lines:["Short.","Stubborn.","Hard to reach.","Still counts."], hint:"availability not guaranteed" }
 ];
 
 let matched = null;
-let failures = 0;
 
-function typeLines(lines, i=0) {
-  if (i >= lines.length) return;
-  textBox.innerText += (i ? "\n" : "") + lines[i];
-  setTimeout(() => typeLines(lines, i+1), 900);
+function typeLines(lines,i=0){
+  if(i>=lines.length) return;
+  textBox.innerText += (i? "\n":"") + lines[i];
+  setTimeout(()=>typeLines(lines,i+1),900);
 }
 
-function setName() {
+function setName(){
   const name = document.getElementById("nameInput").value.toLowerCase().trim();
   localStorage.setItem("archive_name", name);
+  matched = people.find(p=>p.names.includes(name));
 
-  matched = people.find(p => p.names.includes(name));
+  document.getElementById("nameInput").style.display="none";
+  document.querySelector("button").style.display="none";
+  document.getElementById("answerArea").style.display="block";
 
-  document.getElementById("nameInput").style.display = "none";
-  document.querySelector("button").style.display = "none";
-
-  textBox.innerText = "";
-
-  if (matched) {
+  textBox.innerText="";
+  if(matched){
     typeLines(matched.lines);
-    document.getElementById("hint").innerText = matched.hint;
   } else {
-    typeLines([
-      "The creator favors this thing.",
-      "It radiates.",
-      "It rests among elements.",
-      "Is it really a word?"
-    ]);
-    document.getElementById("hint").innerText = "some answers are just numbers";
+    typeLines(["The creator favors something.","It radiates.","It sits among elements.","Is it really a word?"]);
   }
-
-  document.getElementById("answerInput").style.display = "inline-block";
-  document.getElementById("enterBtn").style.display = "inline-block";
 }
 
-function checkAnswer() {
+function checkAnswer(){
   const val = document.getElementById("answerInput").value.trim();
-  if (val === expected) {
-    window.location.href = "88.html";
-  } else {
-    failures++;
-    errorBox.style.display = "block";
-    errorBox.innerText =
-      failures >= 3
-      ? "ARCHIVE DESYNCHRONIZED\nSIGNAL LOST"
-      : "Not quite.";
+  if(val===correct){
+    window.location.href="88.html";
+    return;
   }
+
+  failures++;
+  errorBox.style.display="block";
+  errorBox.innerText = failMessages[Math.min(failures-1, failMessages.length-1)];
+
+  if(failures===5) unlockBox.style.display="block";
+  if(failures>=8) errorBox.innerText="ARCHIVE CORRUPTED\nACCESS DEGRADED";
+  if(failures>=10) window.location.href="88.html";
 }
 </script>
 
