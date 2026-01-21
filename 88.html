@@ -63,7 +63,7 @@ button.spoiler:hover { background: rgba(127,255,193,0.1); }
 }
 .spoiler-overlay.hidden { opacity:0; pointer-events:none; }
 
-/* Loading dots */
+/* Loading dots (YouTube style) */
 .loading-dots {
   display:flex;
   gap:6px;
@@ -116,7 +116,7 @@ button.spoiler:hover { background: rgba(127,255,193,0.1); }
     <div class="spoiler-overlay" id="overlay1">
       <div class="loading-dots"><div></div><div></div><div></div></div>
     </div>
-    <iframe width="100%" height="400" src="https://www.youtube.com/embed/Mg0yid5vbRc" frameborder="0" allowfullscreen style="display:block;"></iframe>
+    <iframe width="100%" height="400" src="https://www.youtube.com/embed/Mg0yid5vbRc" frameborder="0" allowfullscreen></iframe>
     <a class="download" href="https://youtu.be/Mg0yid5vbRc" target="_blank">Download "The Beginning"</a>
   </div>
 </div>
@@ -128,7 +128,7 @@ button.spoiler:hover { background: rgba(127,255,193,0.1); }
     <div class="spoiler-overlay" id="overlay2">
       <div class="loading-dots"><div></div><div></div><div></div></div>
     </div>
-    <iframe width="100%" height="400" src="https://www.youtube.com/embed/V-EtXn2h3qA" frameborder="0" allowfullscreen style="display:block;"></iframe>
+    <iframe width="100%" height="400" src="https://www.youtube.com/embed/V-EtXn2h3qA" frameborder="0" allowfullscreen></iframe>
     <a class="download" href="https://youtu.be/V-EtXn2h3qA" target="_blank">Download "The Second Coming"</a>
   </div>
 </div>
@@ -140,7 +140,7 @@ button.spoiler:hover { background: rgba(127,255,193,0.1); }
     <div class="spoiler-overlay" id="overlay3">
       <div class="loading-dots"><div></div><div></div><div></div></div>
     </div>
-    <iframe width="100%" height="400" src="https://www.youtube.com/embed/jknp7khNAbk" frameborder="0" allowfullscreen style="display:block;"></iframe>
+    <iframe width="100%" height="400" src="https://www.youtube.com/embed/jknp7khNAbk" frameborder="0" allowfullscreen></iframe>
     <a class="download" href="https://youtu.be/jknp7khNAbk" target="_blank">Download "Uncharted Path"</a>
   </div>
 </div>
@@ -152,7 +152,7 @@ button.spoiler:hover { background: rgba(127,255,193,0.1); }
     <div class="spoiler-overlay" id="overlay4">
       <div class="loading-dots"><div></div><div></div><div></div></div>
     </div>
-    <iframe width="100%" height="400" src="https://www.youtube.com/embed/CqmtTeHgO2E" frameborder="0" allowfullscreen style="display:block;"></iframe>
+    <iframe width="100%" height="400" src="https://www.youtube.com/embed/CqmtTeHgO2E" frameborder="0" allowfullscreen></iframe>
     <a class="download" href="https://youtu.be/CqmtTeHgO2E" target="_blank">Download "DELT4"</a>
   </div>
 </div>
@@ -164,7 +164,7 @@ button.spoiler:hover { background: rgba(127,255,193,0.1); }
     <div class="spoiler-overlay" id="overlay5">
       <div class="loading-dots"><div></div><div></div><div></div></div>
     </div>
-    <iframe width="100%" height="400" src="https://www.youtube.com/embed/KBoQu7vkF5A" frameborder="0" allowfullscreen style="display:block;"></iframe>
+    <iframe width="100%" height="400" src="https://www.youtube.com/embed/KBoQu7vkF5A" frameborder="0" allowfullscreen></iframe>
     <a class="download" href="https://youtu.be/KBoQu7vkF5A" target="_blank">Download "Last one. For now"</a>
   </div>
 </div>
@@ -209,23 +209,28 @@ const personalMessages = {
   "mochi":["Mona! Strawberries are sweet.","Take it easy."]
 };
 
-// Reveal video function
 function revealVideo(id){
-  const wrapper=document.getElementById(id);
-  const overlay=wrapper.querySelector(".spoiler-overlay");
+  const wrapper = document.getElementById(id);
+  const overlay = wrapper.querySelector(".spoiler-overlay");
   overlay.classList.add("hidden");
   wrapper.classList.add("reveal");
 }
 
-// Show personalized messages
+// Fixed glitch letters for personalized messages
 function glitchLetters(text, container, index=0){
-  if(index>=text.length) return;
-  const char=text[index];
-  const span=document.createElement("span");
-  span.className="glitch-letter";
-  span.textContent = char;
-  container.appendChild(span);
-  setTimeout(()=>glitchLetters(text,container,index+1),30);
+  if(index >= text.length) return;
+  const char = text[index];
+  if(char === "\n"){
+    container.appendChild(document.createElement("br"));
+  } else if(char === " "){
+    container.appendChild(document.createTextNode(" "));
+  } else {
+    const span = document.createElement("span");
+    span.className = "glitch-letter";
+    span.textContent = char;
+    container.appendChild(span);
+  }
+  setTimeout(()=>glitchLetters(text, container, index+1),30);
 }
 
 function showPersonal(){
