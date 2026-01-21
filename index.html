@@ -1,133 +1,211 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>nothing obvious here</title>
+  <meta charset="UTF-8">
+  <title>?</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
     body {
       margin: 0;
-      padding: 0;
-      background: #0f1110;
+      height: 100vh;
+      background: radial-gradient(circle at center, #121614, #080a09);
       color: #d6f5e3;
-      font-family: "Courier New", Courier, monospace;
+      font-family: "Courier New", monospace;
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* scanlines */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.03),
+        rgba(255,255,255,0.03) 1px,
+        transparent 1px,
+        transparent 3px
+      );
+      pointer-events: none;
+      animation: scan 6s linear infinite;
+    }
+
+    @keyframes scan {
+      from { background-position: 0 0; }
+      to { background-position: 0 100%; }
     }
 
     .gate {
       max-width: 520px;
-      padding: 32px;
-      border: 1px solid rgba(214, 245, 227, 0.2);
-      box-shadow: 0 0 20px rgba(0, 255, 150, 0.1);
-      background: rgba(15, 17, 16, 0.9);
+      padding: 30px;
+      border: 1px dashed rgba(127,255,193,0.35);
+      background: rgba(10,14,12,0.9);
+      text-align: center;
+      box-shadow: 0 0 18px rgba(127,255,193,0.12);
     }
 
-    .gate p {
+    h1 {
+      color: #7fffc1;
+      margin-bottom: 16px;
+    }
+
+    .text {
+      white-space: pre-line;
+      min-height: 6em;
       line-height: 1.6;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
     }
 
-    .gate p:last-of-type {
-      margin-bottom: 24px;
-    }
-
-    input {
-      width: 100%;
-      padding: 10px;
-      background: #050606;
-      border: 1px solid rgba(214, 245, 227, 0.3);
-      color: #d6f5e3;
+    input, button {
       font-family: inherit;
-      font-size: 16px;
-    }
-
-    input:focus {
-      outline: none;
-      border-color: #7fffc1;
-    }
-
-    button {
-      margin-top: 12px;
-      padding: 8px 14px;
-      background: transparent;
-      border: 1px solid rgba(214, 245, 227, 0.3);
+      background: black;
       color: #d6f5e3;
-      cursor: pointer;
-      font-family: inherit;
+      border: 1px solid rgba(214,245,227,0.3);
+      padding: 8px;
+      margin-top: 8px;
     }
 
     button:hover {
-      background: rgba(127, 255, 193, 0.1);
+      background: rgba(127,255,193,0.12);
+      cursor: pointer;
     }
 
-    .response {
-      margin-top: 16px;
-      min-height: 24px;
-      opacity: 0.85;
-    }
-
-    .reveal {
-      margin-top: 20px;
-      padding-top: 16px;
-      border-top: 1px dashed rgba(214, 245, 227, 0.3);
-      color: #9affc8;
-    }
-
-    .hidden {
+    .error {
+      color: #ff9a9a;
+      margin-top: 12px;
       display: none;
+      animation: glitch 0.3s infinite;
+    }
+
+    @keyframes glitch {
+      0% { transform: translate(0); }
+      20% { transform: translate(-1px, 1px); }
+      40% { transform: translate(1px, -1px); }
+      60% { transform: translate(-1px, 0); }
+      80% { transform: translate(1px, 1px); }
+      100% { transform: translate(0); }
+    }
+
+    .hint {
+      opacity: 0.45;
+      font-size: 0.8em;
+      margin-top: 12px;
     }
   </style>
 </head>
 <body>
-  <div class="gate">
-    <p>I like this “word,” though it isn’t one.</p>
-    <p>My friends know it as my favorite number.</p>
-    <p>It glows green, but not for fun reasons.</p>
-    <p>You’ll find it on a table.</p>
 
-    <input id="answer" type="text" placeholder="say it" />
-    <button onclick="checkAnswer()">enter</button>
+<div class="gate">
+  <h1 id="title">Identify Yourself</h1>
+  <div id="text" class="text">Who’s trying to get in?</div>
 
-    <div class="response" id="response"></div>
+  <input id="nameInput" placeholder="name or alias">
+  <br>
+  <button onclick="setName()">Continue</button>
 
-    <div class="reveal hidden" id="reveal">
-      <p>Yeah.</p>
-      <p>That one.</p>
-      <p><strong>/<p><strong>https://4DELTAA.github.io/mysterious-archive/88.html</strong></p></strong></p>
-    </div>
-  </div>
+  <input id="answerInput" placeholder="answer" style="display:none;">
+  <br>
+  <button id="enterBtn" onclick="checkAnswer()" style="display:none;">Enter</button>
 
-  <script>
-    const responses = [
-      "No, but I respect the confidence.",
-      "That glows differently.",
-      "Not wrong forever. Just wrong now.",
-      "Close? Emotionally? Hard to say.",
-      "I like how you arrived there, but no.",
-      "That number feels lonely.",
-      "Interesting guess. Incorrect universe."
-    ];
+  <div id="error" class="error"></div>
+  <div id="hint" class="hint"></div>
+</div>
 
-    function checkAnswer() {
-      const input = document.getElementById("answer").value.trim().toLowerCase();
-      const responseEl = document.getElementById("response");
-      const revealEl = document.getElementById("reveal");
+<script>
+const expected = "88";
+const textBox = document.getElementById("text");
+const errorBox = document.getElementById("error");
 
-      if (input === "88" || input === "radium") {
-        responseEl.textContent = "";
-        revealEl.classList.remove("hidden");
-      } else {
-        const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-        responseEl.textContent = randomResponse;
-      }
-    }
-  </script>
+const people = [
+  { names:["mimi","mie","mieree","mierees"],
+    lines:["You already know this.","It glows green.","You’ve heard me talk about it.","Is it really a word?"],
+    hint:"you don’t need much help"
+  },
+  { names:["saga","snagz_zz"],
+    lines:["Recently relevant.","Radioactive.","Numbered.","Quietly famous."],
+    hint:"school helps sometimes"
+  },
+  { names:["aloise","aloises"],
+    lines:["You know the number.","You know why.","Don’t overthink it."],
+    hint:"trivial"
+  },
+  { names:["snoopy","n0op3e","isimira"],
+    lines:["Beautiful.","Dangerous.","Science giveth.","Science taketh away."],
+    hint:"hazard symbols exist"
+  },
+  { names:["leafeon","leafy","dorian"],
+    lines:["Solve this:","(92 − 4) × 1","Modifiers applied."],
+    hint:"INT: -4"
+  },
+  { names:["glad","ggx2"],
+    lines:["Not everything rare is fictional.","Some numbers are infamous."],
+    hint:"not a gacha"
+  },
+  { names:["ares","alex"],
+    lines:["Longer than most.","You’ve seen worse odds."],
+    hint:"you’ve been here before"
+  },
+  { names:["xia","xixi","fearless nugget"],
+    lines:["Short.","Stubborn.","Hard to reach.","Still counts."],
+    hint:"availability not guaranteed"
+  }
+];
+
+let matched = null;
+let failures = 0;
+
+function typeLines(lines, i=0) {
+  if (i >= lines.length) return;
+  textBox.innerText += (i ? "\n" : "") + lines[i];
+  setTimeout(() => typeLines(lines, i+1), 900);
+}
+
+function setName() {
+  const name = document.getElementById("nameInput").value.toLowerCase().trim();
+  localStorage.setItem("archive_name", name);
+
+  matched = people.find(p => p.names.includes(name));
+
+  document.getElementById("nameInput").style.display = "none";
+  document.querySelector("button").style.display = "none";
+
+  textBox.innerText = "";
+
+  if (matched) {
+    typeLines(matched.lines);
+    document.getElementById("hint").innerText = matched.hint;
+  } else {
+    typeLines([
+      "The creator favors this thing.",
+      "It radiates.",
+      "It rests among elements.",
+      "Is it really a word?"
+    ]);
+    document.getElementById("hint").innerText = "some answers are just numbers";
+  }
+
+  document.getElementById("answerInput").style.display = "inline-block";
+  document.getElementById("enterBtn").style.display = "inline-block";
+}
+
+function checkAnswer() {
+  const val = document.getElementById("answerInput").value.trim();
+  if (val === expected) {
+    window.location.href = "88.html";
+  } else {
+    failures++;
+    errorBox.style.display = "block";
+    errorBox.innerText =
+      failures >= 3
+      ? "ARCHIVE DESYNCHRONIZED\nSIGNAL LOST"
+      : "Not quite.";
+  }
+}
+</script>
+
 </body>
 </html>
-
-
-
