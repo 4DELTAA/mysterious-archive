@@ -4,30 +4,47 @@
 <meta charset="UTF-8">
 <title>Hidden Archive Gate</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
 body {
-  margin:0;
-  font-family:"Courier New", monospace;
-  background:#0f1110;
-  color:#d6f5e3;
+  margin: 0;
+  height: 100vh;
+  background: radial-gradient(circle, #121614, #070908);
+  color: #d6f5e3;
+  font-family: "Courier New", monospace;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
-.container {
-  max-width:800px;
-  margin:0 auto;
-  padding:40px 20px;
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(to bottom,
+    rgba(255,255,255,0.035), rgba(255,255,255,0.035) 1px,
+    transparent 1px, transparent 3px
+  );
+  animation: scan 6s linear infinite;
+  pointer-events: none;
 }
-h1 { text-align:center; color:#7fffc1; margin-bottom:20px; }
-input { padding:6px 10px; font-size:1em; width:calc(100% - 24px); margin-bottom:10px; }
-button { padding:6px 12px; cursor:pointer; margin-bottom:20px; }
-.personal-text {
-  margin-top:10px;
-  min-height:3em;
-  white-space:pre-wrap;
-  word-break:break-word;
-  line-height:1.3em;
+@keyframes scan { from {background-position:0 0;} to {background-position:0 100%;} }
+
+.gate { max-width:540px; padding:32px; border:1px dashed rgba(127,255,193,0.35); background:rgba(8,14,10,0.92); text-align:center; }
+h1 { color:#7fffc1; }
+.text { white-space: pre-wrap; min-height:6em; margin:20px 0; }
+input, button { background:black; color:#d6f5e3; border:1px solid rgba(214,245,227,0.3); padding:8px; font-family:inherit; }
+button:hover { background: rgba(127,255,193,0.12); cursor:pointer; }
+.error { margin-top:14px; color:#ff9a9a; display:none; animation: glitch 0.3s infinite; }
+@keyframes glitch {
+  0% { transform: translate(0); }
+  25% { transform: translate(-1px,1px); }
+  50% { transform: translate(1px,-1px); }
+  75% { transform: translate(-1px,0); }
+  100% { transform: translate(0); }
 }
-.glitch-letter { display:inline; animation: glitchChar 0.1s infinite; }
+.unlock { display:none; margin-top:18px; color:#9affc8; opacity:0.6; font-size:0.85em; }
+
+.glitch-letter { display:inline-block; position:relative; animation: glitchChar 0.1s infinite; }
 @keyframes glitchChar {
   0% { transform:translate(0,0); color:#d6f5e3; text-shadow:none;}
   25% { transform:translate(-1px,1px); color:#9affc8; text-shadow:1px 0 #ff9a9a;}
@@ -35,87 +52,120 @@ button { padding:6px 12px; cursor:pointer; margin-bottom:20px; }
   75% { transform:translate(-1px,0); color:#d6f5e3; text-shadow:1px 0 #ff9a9a,-1px 0 #9affc8;}
   100% { transform:translate(0,0); color:#d6f5e3; text-shadow:none;}
 }
+
+/* Loading dots for messages */
+.loading-dots { display:inline-flex; gap:4px; margin-left:4px; vertical-align:middle; }
+.loading-dots div { width:6px; height:6px; border-radius:50%; background:#7fffc1; opacity:0.3; animation: dotFade 1s infinite; }
+.loading-dots div:nth-child(1){ animation-delay:0s; }
+.loading-dots div:nth-child(2){ animation-delay:0.2s; }
+.loading-dots div:nth-child(3){ animation-delay:0.4s; }
+@keyframes dotFade {
+  0%,80%,100% { opacity:0.3; }
+  40% { opacity:1; }
+}
 </style>
 </head>
 <body>
-<div class="container">
-<h1 id="title">Identify Yourself</h1>
-<input type="text" id="nameInput" placeholder="Enter your name or alias">
-<button onclick="submitName()">Enter</button>
-<div id="personal" class="personal-text"></div>
+<div class="gate">
+  <h1 id="gateHeader">Identify Yourself</h1>
+  <div id="text" class="text">Who’s trying to get in?</div>
+
+  <input id="nameInput" placeholder="name or alias"><br><br>
+  <button onclick="setName()">Continue</button>
+
+  <div id="answerArea" style="display:none;">
+    <input id="answerInput" placeholder="answer"><br><br>
+    <button onclick="checkAnswer()">Enter</button>
+  </div>
+
+  <div id="error" class="error"></div>
+  <div id="unlock" class="unlock">Something loosened.<br>Even mistakes can open doors.</div>
+</div>
 
 <script>
-const personalizedGreetings = {
-  "mimi":["Hey Mimi! You know 88, you got this.","Radium would be proud.","Enjoy the archive <3"],
-  "mie":["Hey Mimi! You know 88, you got this.","Radium would be proud.","Enjoy the archive <3"],
-  "mieree":["Hey Mimi! You know 88, you got this.","Radium would be proud.","Enjoy the archive <3"],
-  "mierees":["Hey Mimi! You know 88, you got this.","Radium would be proud.","Enjoy the archive <3"],
-  "saga":["Hello Saga! Check this out carefully.","Your studies helped.","Number 88 again!"],
-  "snagz_zz":["Hello Saga! Check this out carefully.","Your studies helped.","Number 88 again!"],
-  "aloise":["Aloise! The number 88 welcomes you.","Enjoy your exploration."],
-  "aloises":["Aloise! The number 88 welcomes you.","Enjoy your exploration."],
-  "snoopy":["Snoopy! Watch out, radium is dangerous.","Stay safe, scientist."],
-  "n0op3e":["Snoopy! Watch out, radium is dangerous.","Stay safe, scientist."],
-  "isimira":["Snoopy! Watch out, radium is dangerous.","Stay safe, scientist."],
-  "leafeon":["Leafy, -4 intelligence? Math is tricky!","Try your best!"],
-  "leafy":["Leafy, -4 intelligence? Math is tricky!","Try your best!"],
-  "dorian":["Leafy, -4 intelligence? Math is tricky!","Try your best!"],
-  "glad":["Glad! Don’t overthink, enjoy."],
-  "ggx2":["Glad! Don’t overthink, enjoy."],
-  "ares":["Ares! Longtime friend, here’s the archive."],
-  "alex":["Ares! Longtime friend, here’s the archive."],
-  "xia":["Xia! You’re short but mighty.","Good luck viewing."],
-  "xixi":["Xia! You’re short but mighty.","Good luck viewing."],
-  "fearless nugget":["Xia! You’re short but mighty.","Good luck viewing."],
-  "mona":["Mona! Strawberries are sweet.","Take it easy."],
-  "mochi":["Mona! Strawberries are sweet.","Take it easy."]
-};
+const correct="88"; let failures=0;
+const failMessages=["Incorrect.","No.","Still not it.","You’re circling it.","You already know this.","Stop guessing.","This isn’t random.","Last warning."];
 
-function glitchLetters(text, container, index=0){
-  if(index >= text.length) return;
+const textBox=document.getElementById("text");
+const errorBox=document.getElementById("error");
+const unlockBox=document.getElementById("unlock");
+const gateHeader=document.getElementById("gateHeader");
+
+const people=[
+  {names:["mimi","mie","mieree","mierees"], lines:["You already know this.","It glows green.","You’ve heard me talk about it.","Is it really a word?"], hint:"you don’t need much help"},
+  {names:["saga","snagz_zz"], lines:["Recently relevant.","Radioactive.","Numbered.","Quietly famous."], hint:"school helps sometimes"},
+  {names:["aloise","aloises"], lines:["You know the number.","You know why.","Don’t overthink it."], hint:"trivial"},
+  {names:["snoopy","n0op3e","isimira"], lines:["Beautiful.","Dangerous.","Science giveth.","Science taketh away."], hint:"hazard symbols exist"},
+  {names:["leafeon","leafy","dorian"], lines:["Solve this:","(92 − 4) × 1","Modifiers applied."], hint:"INT: -4"},
+  {names:["glad","ggx2"], lines:["Not everything rare is fictional.","Some numbers matter."], hint:"simpler clues"},
+  {names:["ares","alex"], lines:["Longer than most.","You’ve seen worse odds."], hint:"you’ve been here before"},
+  {names:["xia","xixi","fearless nugget"], lines:["Short.","Stubborn.","Hard to reach.","Still counts."], hint:"availability not guaranteed"},
+  {names:["mona","mochi"], lines:["Strawberries are sweet.","Look carefully.","Don’t overthink it."], hint:"easy"}
+];
+let matched=null;
+
+// fixed glitch typing including spaces and newlines
+function typeGlitchLetters(text,container,index=0){
+  if(index>=text.length) return;
   const char = text[index];
-  if(char === "\n") {
-    container.appendChild(document.createElement("br"));
-  } else if(char === " ") {
-    container.appendChild(document.createTextNode(" "));
-  } else {
-    const span = document.createElement("span");
-    span.className = "glitch-letter";
-    span.textContent = char;
+  if(char === "\n") container.appendChild(document.createElement("br"));
+  else if(char === " ") container.appendChild(document.createTextNode(" "));
+  else{
+    const span=document.createElement("span");
+    span.className="glitch-letter";
+    span.innerText=char;
     container.appendChild(span);
   }
-  setTimeout(()=>glitchLetters(text,container,index+1),30);
+  setTimeout(()=>typeGlitchLetters(text,container,index+1), 40+Math.random()*30);
 }
 
-function submitName(){
-  const input = document.getElementById("nameInput");
-  const name = input.value.trim().toLowerCase();
-  const container = document.getElementById("personal");
-  container.innerHTML="";
-  
-  if(name === "delta" || name === "napper"){
-    document.body.innerHTML="<h1 style='color:#ff4a4a; text-align:center;'>ACCESS DENIED</h1>";
-    return;
-  }
-
-  localStorage.setItem("archive_name", name);
-
-  let messages = personalizedGreetings[name] || ["Welcome, guest.","Try solving the riddle to access the archive."];
-  
-  let delay = 0;
-  messages.forEach(msg=>{
+function typeLines(lines,i=0){
+  if(i>=lines.length) return;
+  typeGlitchLetters(lines[i],textBox);
+  if(i+1<lines.length){
     setTimeout(()=>{
-      glitchLetters(msg,container);
-      container.appendChild(document.createElement("br"));
-    }, delay);
-    delay += msg.length*35 + 150;
-  });
+      textBox.appendChild(document.createElement("br"));
+      typeLines(lines,i+1);
+    },lines[i].length*50+100);
+  }
+}
 
-  document.getElementById("title").innerText="Welcome!";
-  input.style.display="none";
-  input.nextElementSibling.style.display="none"; // hide button
+function selfDestruct(){
+  document.body.innerHTML="";
+  const msg=document.createElement("div");
+  msg.style.color="#ff4a4a";
+  msg.style.fontFamily="Courier New, monospace";
+  msg.style.fontSize="2em";
+  msg.style.textAlign="center";
+  msg.style.marginTop="40vh";
+  msg.innerText="ACCESS DENIED\nARCHIVE DESTROYED";
+  document.body.appendChild(msg);
+}
+
+function setName(){
+  const name=document.getElementById("nameInput").value.toLowerCase().trim();
+  if(["delta","napper"].includes(name)){selfDestruct(); return;}
+  localStorage.setItem("archive_name",name);
+  matched=people.find(p=>p.names.includes(name));
+  document.getElementById("nameInput").style.display="none";
+  document.querySelector("button").style.display="none";
+  document.getElementById("answerArea").style.display="block";
+  gateHeader.innerText="Let’s see if you can unlock the archive…";
+  textBox.innerHTML="";
+  if(matched){typeLines(matched.lines);}
+  else{typeLines(["The creator favors something.","It radiates.","It sits among elements.","Is it really a word?"]);}
+}
+
+function checkAnswer(){
+  const val=document.getElementById("answerInput").value.trim();
+  if(val===correct){window.location.href="88.html"; return;}
+  failures++;
+  errorBox.style.display="block";
+  errorBox.innerText=failMessages[Math.min(failures-1,failMessages.length-1)];
+  if(failures===5) unlockBox.style.display="block";
+  if(failures>=8) errorBox.innerText="ARCHIVE CORRUPTED\nACCESS DEGRADED";
+  if(failures>=10) window.location.href="88.html";
 }
 </script>
-</div>
 </body>
 </html>
