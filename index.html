@@ -123,8 +123,6 @@ button:hover {
 </div>
 
 <script>
-/* ---------------- CONFIG ---------------- */
-
 const correct = "88";
 let failures = 0;
 
@@ -189,22 +187,16 @@ const people = [
   ]}
 ];
 
-/* ---------------- UTILS ---------------- */
-
 const textBox = document.getElementById("text");
 const errorBox = document.getElementById("error");
 const unlockBox = document.getElementById("unlock");
 const gateHeader = document.getElementById("gateHeader");
 
-/* CLEAN, SEQUENTIAL typing — NO overlap */
 function typeLine(line) {
   return new Promise(resolve => {
     let i = 0;
     function step() {
-      if (i >= line.length) {
-        resolve();
-        return;
-      }
+      if (i >= line.length) return resolve();
       const ch = line[i++];
       if (ch === " ") {
         textBox.appendChild(document.createTextNode(" "));
@@ -231,26 +223,15 @@ async function typeLinesSequential(lines) {
   }
 }
 
-/* ---------------- LOGIC ---------------- */
-
 function selfDestruct() {
-  document.body.innerHTML = "";
-  const msg = document.createElement("div");
-  msg.style.color = "#ff4a4a";
-  msg.style.fontFamily = "Courier New, monospace";
-  msg.style.fontSize = "2em";
-  msg.style.textAlign = "center";
-  msg.style.marginTop = "40vh";
-  msg.textContent = "ACCESS DENIED\nARCHIVE DESTROYED";
-  document.body.appendChild(msg);
+  document.body.innerHTML = "<h1 style='color:#ff4a4a;text-align:center;margin-top:40vh;'>ACCESS DENIED<br>ARCHIVE DESTROYED</h1>";
 }
 
 function setName() {
   const name = document.getElementById("nameInput").value.toLowerCase().trim();
-  if (["delta","napper"].includes(name)) {
-    selfDestruct();
-    return;
-  }
+  if (["delta","napper"].includes(name)) return selfDestruct();
+
+  localStorage.setItem("archive_name", name);
 
   document.getElementById("nameInput").style.display = "none";
   document.querySelector("button").style.display = "none";
@@ -258,29 +239,19 @@ function setName() {
   gateHeader.textContent = "Let’s see if you can unlock the archive…";
 
   const person = people.find(p => p.names.includes(name));
-  if (person) {
-    typeLinesSequential(person.lines);
-  } else {
-    typeLinesSequential([
-      "The creator favors something.",
-      "It radiates.",
-      "It sits among elements.",
-      "Is it really a word?"
-    ]);
-  }
+  typeLinesSequential(
+    person ? person.lines :
+    ["The creator favors something.","It radiates.","It sits among elements.","Is it really a word?"]
+  );
 }
 
 function checkAnswer() {
   const val = document.getElementById("answerInput").value.trim();
-  if (val === correct) {
-    window.location.href = "88.html";
-    return;
-  }
+  if (val === correct) return window.location.href = "88.html";
   failures++;
   errorBox.style.display = "block";
   errorBox.textContent = failMessages[Math.min(failures - 1, failMessages.length - 1)];
   if (failures === 5) unlockBox.style.display = "block";
-  if (failures >= 8) errorBox.textContent = "ARCHIVE CORRUPTED\nACCESS DEGRADED";
   if (failures >= 10) window.location.href = "88.html";
 }
 </script>
