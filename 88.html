@@ -93,6 +93,99 @@ button.spoiler:hover { background: rgba(127,255,193,0.1); }
   line-height:1.3em;
 }
 
+.section-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 24px;
+  padding: 8px 16px;
+  border: 1px solid rgba(214,245,227,0.35);
+  background: rgba(8, 14, 10, 0.8);
+  color: #d6f5e3;
+  cursor: pointer;
+}
+
+.section-toggle:hover {
+  background: rgba(127,255,193,0.12);
+}
+
+.music-section {
+  display: none;
+}
+
+.music-section.visible {
+  display: block;
+}
+
+.vote-text {
+  margin: 10px 0 16px;
+  color: rgba(214,245,227,0.8);
+  line-height: 1.4em;
+}
+
+.vote-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.vote-controls input {
+  flex: 1 1 220px;
+}
+
+.vote-status {
+  margin-top: 10px;
+  color: #9affc8;
+  min-height: 1.4em;
+}
+
+.vote-tally {
+  margin-top: 16px;
+  padding-left: 18px;
+  color: rgba(214,245,227,0.9);
+}
+
+.music-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.music-card {
+  border: 1px solid rgba(127,255,193,0.3);
+  padding: 12px;
+  background: rgba(10, 12, 11, 0.9);
+}
+
+.music-card h3 {
+  margin: 0 0 10px;
+  color: #9affc8;
+  font-size: 1em;
+}
+
+.music-card iframe {
+  width: 100%;
+  height: 160px;
+  border: 0;
+}
+
+.music-card button {
+  margin-top: 10px;
+  width: 100%;
+  padding: 6px 12px;
+  border: 1px solid rgba(214,245,227,0.3);
+  background: rgba(15, 17, 16, 0.8);
+  color: #d6f5e3;
+  cursor: pointer;
+}
+
+.music-card button:hover {
+  background: rgba(127,255,193,0.12);
+}
+
 .glitch-letter { display:inline; animation: glitchChar 0.1s infinite; }
 @keyframes glitchChar {
   0% { transform:translate(0,0); color:#d6f5e3; text-shadow:none;}
@@ -107,6 +200,21 @@ button.spoiler:hover { background: rgba(127,255,193,0.1); }
 <div class="container">
 <h1 id="greeting">Hidden Archive</h1>
 <div id="personal" class="personal-text"></div>
+
+<button class="section-toggle" type="button" onclick="toggleMusicSection()">
+  Enter the Music Vote Chamber
+</button>
+
+<div class="section music-section" id="musicVoteSection">
+  <h2>Music Video Ballot</h2>
+  <p class="vote-text">Add your name, then vote for the music video that should score the new cut. Each name counts once.</p>
+  <div class="vote-controls">
+    <input id="voteName" placeholder="enter your name or alias">
+  </div>
+  <div id="voteStatus" class="vote-status"></div>
+  <div id="musicVoteList" class="music-grid"></div>
+  <ul id="voteTally" class="vote-tally"></ul>
+</div>
 
 <!-- Video Sections -->
 <div class="section">
@@ -249,7 +357,95 @@ function showPersonal(){
   document.getElementById("greeting").innerText="Welcome to the Archive!";
 }
 
-window.onload = showPersonal;
+const musicVideos = [
+  { title: "Music Video 1", id: "mrAG3bZ0NGA", url: "https://www.youtube.com/watch?v=mrAG3bZ0NGA" },
+  { title: "Music Video 2", id: "FtutLA63Cp8", url: "https://www.youtube.com/watch?v=FtutLA63Cp8" },
+  { title: "Music Video 3", id: "GZqi2Nv2M04", url: "https://www.youtube.com/watch?v=GZqi2Nv2M04" },
+  { title: "Music Video 4", id: "w3RDwQjUekU", url: "https://www.youtube.com/watch?v=w3RDwQjUekU" },
+  { title: "Music Video 5", id: "ux3QETpLcPs", url: "https://www.youtube.com/watch?v=ux3QETpLcPs" },
+  { title: "Music Video 6", id: "EHpUtZ7yiYc", url: "https://www.youtube.com/watch?v=EHpUtZ7yiYc" },
+  { title: "Music Video 7", id: "FezNgPThD3M", url: "https://www.youtube.com/watch?v=FezNgPThD3M" },
+  { title: "Music Video 8", id: "EK2w6qA5zz8", url: "https://www.youtube.com/watch?v=EK2w6qA5zz8" }
+];
+
+function getVoteRecords() {
+  try {
+    return JSON.parse(localStorage.getItem("archive_music_votes") || "{}");
+  } catch (error) {
+    return {};
+  }
+}
+
+function saveVoteRecords(records) {
+  localStorage.setItem("archive_music_votes", JSON.stringify(records));
+}
+
+function renderVoteTally() {
+  const tally = musicVideos.reduce((acc, video) => {
+    acc[video.title] = 0;
+    return acc;
+  }, {});
+  const records = getVoteRecords();
+  Object.values(records).forEach(option => {
+    if (tally[option] !== undefined) {
+      tally[option] += 1;
+    }
+  });
+  const list = document.getElementById("voteTally");
+  list.innerHTML = "";
+  musicVideos.forEach(video => {
+    const item = document.createElement("li");
+    item.textContent = `${video.title}: ${tally[video.title]} vote${tally[video.title] === 1 ? "" : "s"}`;
+    list.appendChild(item);
+  });
+}
+
+function castVote(option) {
+  const nameInput = document.getElementById("voteName");
+  const status = document.getElementById("voteStatus");
+  const name = nameInput.value.trim();
+  if (!name) {
+    status.textContent = "A name is required to log a vote.";
+    status.style.color = "#ff9a9a";
+    return;
+  }
+  const records = getVoteRecords();
+  records[name.toLowerCase()] = option;
+  saveVoteRecords(records);
+  status.textContent = `Vote recorded for ${option}. Thank you, ${name}.`;
+  status.style.color = "#9affc8";
+  renderVoteTally();
+}
+
+function renderMusicOptions() {
+  const list = document.getElementById("musicVoteList");
+  list.innerHTML = "";
+  musicVideos.forEach(video => {
+    const card = document.createElement("div");
+    card.className = "music-card";
+    card.innerHTML = `
+      <h3>${video.title}</h3>
+      <iframe src="https://www.youtube.com/embed/${video.id}" allowfullscreen></iframe>
+      <button type="button" onclick="castVote('${video.title}')">Vote for this video</button>
+      <a class="download" href="${video.url}" target="_blank">Open on YouTube</a>
+    `;
+    list.appendChild(card);
+  });
+}
+
+function toggleMusicSection() {
+  const section = document.getElementById("musicVoteSection");
+  section.classList.toggle("visible");
+  if (section.classList.contains("visible")) {
+    section.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
+window.onload = () => {
+  showPersonal();
+  renderMusicOptions();
+  renderVoteTally();
+};
 </script>
 </body>
 </html>
