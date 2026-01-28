@@ -206,21 +206,6 @@ button.spoiler:hover { background: rgba(127,255,193,0.1); }
 </button>
 
 <div class="section music-section" id="musicVoteSection">
-  <hr style="border:0;border-top:1px dashed rgba(127,255,193,0.3);margin:18px 0;">
-
-<div class="vote-text">Who voted for what (live):</div>
-<ul id="voteWho" class="vote-tally"></ul>
-
-<div class="vote-text">Recent votes (latest first):</div>
-<ul id="voteRecent" class="vote-tally"></ul>
-
-<hr style="border:0;border-top:1px dashed rgba(127,255,193,0.3);margin:18px 0;">
-
-<div class="vote-controls" style="justify-content: space-between;">
-  <button id="adminLoginBtn" type="button">Admin Login (Google)</button>
-  <button id="adminResetBtn" type="button" style="display:none;">Admin: Reset All Votes</button>
-</div>
-<div id="adminStatus" class="vote-status"></div>
   <h2>Music Video Ballot</h2>
   <p class="vote-text">Add your name, then vote for the music video that should score the new cut. Each name counts once.</p>
   <div class="vote-controls">
@@ -337,121 +322,83 @@ const db = getFirestore(app);
 /* ================= PERSONALIZATION (UNCHANGED) ================= */
 
 const personalMessages = {
-diff --git a/88.html b/88.html
-index 4b4bd3b104ae23fb65a76e1eb8495ec72b0096c9..8c3104d4fb59e56bc8309496c232260ef99d6932 100644
---- a/88.html
-+++ b/88.html
-@@ -340,77 +340,88 @@ const personalMessages = {
-   "mimi":["Hey Mimi! You know 88, you got this.","Radium would be proud.","Enjoy the archive <3"],
-   "mie":["Hey Mimi! You know 88, you got this.","Radium would be proud.","Enjoy the archive <3"],
-   "mieree":["Hey Mimi! You know 88, you got this.","Radium would be proud.","Enjoy the archive <3"],
-   "mierees":["Hey Mimi! You know 88, you got this.","Radium would be proud.","Enjoy the archive <3"],
-   "saga":["Hello Saga! Check this out carefully.","Your studies helped.","Number 88 again!"],
-   "snagz_zz":["Hello Saga! Check this out carefully.","Your studies helped.","Number 88 again!"],
-   "aloise":["Aloise! The number 88 welcomes you.","Enjoy your exploration."],
-   "aloises":["Aloise! The number 88 welcomes you.","Enjoy your exploration."],
-   "snoopy":["Snoopy! Watch out, radium is dangerous.","Stay safe, scientist."],
-   "n0op3e":["Snoopy! Watch out, radium is dangerous.","Stay safe, scientist."],
-   "isimira":["Snoopy! Watch out, radium is dangerous.","Stay safe, scientist."],
-   "leafeon":["Leafy, -4 intelligence? Math is tricky!","Try your best!"],
-   "leafy":["Leafy, -4 intelligence? Math is tricky!","Try your best!"],
-   "dorian":["Leafy, -4 intelligence? Math is tricky!","Try your best!"],
-   "glad":["Glad! Don’t overthink, enjoy."],
-   "ggx2":["Glad! Don’t overthink, enjoy."],
-   "ares":["Ares! Longtime friend, here’s the archive."],
-   "alex":["Ares! Longtime friend, here’s the archive."],
-   "xia":["Xia! You’re short but mighty.","Good luck viewing."],
-   "xixi":["Xia! You’re short but mighty.","Good luck viewing."],
-   "fearless nugget":["Xia! You’re short but mighty.","Good luck viewing."],
-   "mona":["Mona! Strawberries are sweet.","Take it easy."],
-   "mochi":["Mona! Strawberries are sweet.","Take it easy."]
- };
- 
--function glitchLetters(text, container, index = 0) {
--  if (index >= text.length) return;
--  const char = text[index];
--  if (char === " ") {
--    container.appendChild(document.createTextNode(" "));
--  } else {
--    const span = document.createElement("span");
--    span.className = "glitch-letter";
--    span.textContent = char;
--    container.appendChild(span);
--  }
--  setTimeout(() => glitchLetters(text, container, index + 1), 28);
-+function glitchLetters(text, container) {
-+  return new Promise(resolve => {
-+    let index = 0;
-+    const step = () => {
-+      if (index >= text.length) {
-+        resolve();
-+        return;
-+      }
-+      const char = text[index];
-+      if (char === " ") {
-+        container.appendChild(document.createTextNode(" "));
-+      } else {
-+        const span = document.createElement("span");
-+        span.className = "glitch-letter";
-+        span.textContent = char;
-+        container.appendChild(span);
-+      }
-+      index += 1;
-+      setTimeout(step, 28);
-+    };
-+    step();
-+  });
-+}
-+
-+function delay(ms) {
-+  return new Promise(resolve => setTimeout(resolve, ms));
- }
- 
--function showPersonal() {
-+async function showPersonal() {
-   const name = (localStorage.getItem("archive_name") || "").toLowerCase();
-   const box = document.getElementById("personal");
-   box.innerHTML = "";
-   const lines = personalMessages[name] || ["Welcome, guest.","Enjoy the hidden archive."];
--  let delay = 0;
--  lines.forEach(line => {
--    setTimeout(() => {
--      glitchLetters(line, box);
--      box.appendChild(document.createElement("br"));
--    }, delay);
--    delay += line.length * 35 + 160;
--  });
-+  for (const line of lines) {
-+    await glitchLetters(line, box);
-+    box.appendChild(document.createElement("br"));
-+    await delay(160);
-+  }
-   document.getElementById("greeting").innerText = "Welcome to the Archive!";
- }
- 
- /* ================= VIDEO SPOILERS ================= */
- 
- window.revealVideo = function(id) {
-   const wrapper = document.getElementById(id);
-   const overlay = wrapper.querySelector(".spoiler-overlay");
-   if (!overlay || overlay.classList.contains("hidden")) return;
-   wrapper.classList.add("reveal");
-   setTimeout(() => overlay.classList.add("hidden"), 700);
- };
- 
- /* ================= MUSIC VOTING (FIRESTORE, SHARED) ================= */
- 
- const musicVideos = [
-   { title: "Coconut Mall", id: "mrAG3bZ0NGA", url: "https://www.youtube.com/watch?v=mrAG3bZ0NGA" },
-   { title: "Bad Apple", id: "FtutLA63Cp8", url: "https://www.youtube.com/watch?v=FtutLA63Cp8" },
-   { title: "Powerpuff Girls", id: "GZqi2Nv2M04", url: "https://www.youtube.com/watch?v=GZqi2Nv2M04" },
-   { title: "Romance Sengen", id: "w3RDwQjUekU", url: "https://www.youtube.com/watch?v=w3RDwQjUekU" },
-   { title: "IRIS OUT", id: "ux3QETpLcPs", url: "https://www.youtube.com/watch?v=ux3QETpLcPs" },
-   { title: "It's been so RAAAH", id: "EHpUtZ7yiYc", url: "https://www.youtube.com/watch?v=EHpUtZ7yiYc" },
-   { title: "Papyrus", id: "FezNgPThD3M", url: "https://www.youtube.com/watch?v=FezNgPThD3M" },
-   { title: "Chess Type Beat", id: "EK2w6qA5zz8", url: "https://www.youtube.com/watch?v=EK2w6qA5zz8" }
- ];
+  "mimi":["Hey Mimi! You know 88, you got this.","Radium would be proud.","Enjoy the archive <3"],
+  "mie":["Hey Mimi! You know 88, you got this.","Radium would be proud.","Enjoy the archive <3"],
+  "mieree":["Hey Mimi! You know 88, you got this.","Radium would be proud.","Enjoy the archive <3"],
+  "mierees":["Hey Mimi! You know 88, you got this.","Radium would be proud.","Enjoy the archive <3"],
+  "saga":["Hello Saga! Check this out carefully.","Your studies helped.","Number 88 again!"],
+  "snagz_zz":["Hello Saga! Check this out carefully.","Your studies helped.","Number 88 again!"],
+  "aloise":["Aloise! The number 88 welcomes you.","Enjoy your exploration."],
+  "aloises":["Aloise! The number 88 welcomes you.","Enjoy your exploration."],
+  "snoopy":["Snoopy! Watch out, radium is dangerous.","Stay safe, scientist."],
+  "n0op3e":["Snoopy! Watch out, radium is dangerous.","Stay safe, scientist."],
+  "isimira":["Snoopy! Watch out, radium is dangerous.","Stay safe, scientist."],
+  "leafeon":["Leafy, -4 intelligence? Math is tricky!","Try your best!"],
+  "leafy":["Leafy, -4 intelligence? Math is tricky!","Try your best!"],
+  "dorian":["Leafy, -4 intelligence? Math is tricky!","Try your best!"],
+  "glad":["Glad! Don’t overthink, enjoy."],
+  "ggx2":["Glad! Don’t overthink, enjoy."],
+  "ares":["Ares! Longtime friend, here’s the archive."],
+  "alex":["Ares! Longtime friend, here’s the archive."],
+  "xia":["Xia! You’re short but mighty.","Good luck viewing."],
+  "xixi":["Xia! You’re short but mighty.","Good luck viewing."],
+  "fearless nugget":["Xia! You’re short but mighty.","Good luck viewing."],
+  "mona":["Mona! Strawberries are sweet.","Take it easy."],
+  "mochi":["Mona! Strawberries are sweet.","Take it easy."]
+};
 
+function glitchLetters(text, container, index = 0) {
+  if (index >= text.length) return;
+  const char = text[index];
+  if (char === " ") {
+    container.appendChild(document.createTextNode(" "));
+  } else {
+    const span = document.createElement("span");
+    span.className = "glitch-letter";
+    span.textContent = char;
+    container.appendChild(span);
+  }
+  setTimeout(() => glitchLetters(text, container, index + 1), 28);
+}
+
+function showPersonal() {
+  const name = (localStorage.getItem("archive_name") || "").toLowerCase();
+  const box = document.getElementById("personal");
+  box.innerHTML = "";
+  const lines = personalMessages[name] || ["Welcome, guest.","Enjoy the hidden archive."];
+  let delay = 0;
+  lines.forEach(line => {
+    setTimeout(() => {
+      glitchLetters(line, box);
+      box.appendChild(document.createElement("br"));
+    }, delay);
+    delay += line.length * 35 + 160;
+  });
+  document.getElementById("greeting").innerText = "Welcome to the Archive!";
+}
+
+/* ================= VIDEO SPOILERS ================= */
+
+window.revealVideo = function(id) {
+  const wrapper = document.getElementById(id);
+  const overlay = wrapper.querySelector(".spoiler-overlay");
+  if (!overlay || overlay.classList.contains("hidden")) return;
+  wrapper.classList.add("reveal");
+  setTimeout(() => overlay.classList.add("hidden"), 700);
+};
+
+/* ================= MUSIC VOTING (FIRESTORE, SHARED) ================= */
+
+const musicVideos = [
+  { title: "Coconut Mall", id: "mrAG3bZ0NGA", url: "https://www.youtube.com/watch?v=mrAG3bZ0NGA" },
+  { title: "Bad Apple", id: "FtutLA63Cp8", url: "https://www.youtube.com/watch?v=FtutLA63Cp8" },
+  { title: "Powerpuff Girls", id: "GZqi2Nv2M04", url: "https://www.youtube.com/watch?v=GZqi2Nv2M04" },
+  { title: "Romance Sengen", id: "w3RDwQjUekU", url: "https://www.youtube.com/watch?v=w3RDwQjUekU" },
+  { title: "IRIS OUT", id: "ux3QETpLcPs", url: "https://www.youtube.com/watch?v=ux3QETpLcPs" },
+  { title: "It's been so RAAAH", id: "EHpUtZ7yiYc", url: "https://www.youtube.com/watch?v=EHpUtZ7yiYc" },
+  { title: "Papyrus", id: "FezNgPThD3M", url: "https://www.youtube.com/watch?v=FezNgPThD3M" },
+  { title: "Chess Type Beat", id: "EK2w6qA5zz8", url: "https://www.youtube.com/watch?v=EK2w6qA5zz8" }
+];
 
 const votesCol = collection(db, "musicVotes");
 let liveVotes = {};
