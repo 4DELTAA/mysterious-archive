@@ -206,6 +206,21 @@ button.spoiler:hover { background: rgba(127,255,193,0.1); }
 </button>
 
 <div class="section music-section" id="musicVoteSection">
+  <hr style="border:0;border-top:1px dashed rgba(127,255,193,0.3);margin:18px 0;">
+
+<div class="vote-text">Who voted for what (live):</div>
+<ul id="voteWho" class="vote-tally"></ul>
+
+<div class="vote-text">Recent votes (latest first):</div>
+<ul id="voteRecent" class="vote-tally"></ul>
+
+<hr style="border:0;border-top:1px dashed rgba(127,255,193,0.3);margin:18px 0;">
+
+<div class="vote-controls" style="justify-content: space-between;">
+  <button id="adminLoginBtn" type="button">Admin Login (Google)</button>
+  <button id="adminResetBtn" type="button" style="display:none;">Admin: Reset All Votes</button>
+</div>
+<div id="adminStatus" class="vote-status"></div>
   <h2>Music Video Ballot</h2>
   <p class="vote-text">Add your name, then vote for the music video that should score the new cut. Each name counts once.</p>
   <div class="vote-controls">
