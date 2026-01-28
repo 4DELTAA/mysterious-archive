@@ -290,7 +290,37 @@ button.spoiler:hover { background: rgba(127,255,193,0.1); }
 
 </div>
 
-<script>
+<script type="module">
+/* ================= FIREBASE (CDN, BROWSER SAFE) ================= */
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  doc,
+  setDoc,
+  onSnapshot,
+  serverTimestamp,
+  query
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+/* ================= YOUR FIREBASE CONFIG ================= */
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBC8G_arzFeVfNsc3JmluXfAR9Q89QnYs4",
+  authDomain: "hidden-archive-b1877.firebaseapp.com",
+  projectId: "hidden-archive-b1877",
+  storageBucket: "hidden-archive-b1877.firebasestorage.app",
+  messagingSenderId: "496285101448",
+  appId: "1:496285101448:web:9a547ddfffa3b354705e3d",
+  measurementId: "G-MHGMMPK198"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+/* ================= PERSONALIZATION (UNCHANGED) ================= */
+
 const personalMessages = {
   "mimi":["Hey Mimi! You know 88, you got this.","Radium would be proud.","Enjoy the archive <3"],
   "mie":["Hey Mimi! You know 88, you got this.","Radium would be proud.","Enjoy the archive <3"],
@@ -317,20 +347,10 @@ const personalMessages = {
   "mochi":["Mona! Strawberries are sweet.","Take it easy."]
 };
 
-function revealVideo(id){
-  const wrapper = document.getElementById(id);
-  const overlay = wrapper.querySelector(".spoiler-overlay");
-  overlay.classList.add("hidden");
-  wrapper.classList.add("reveal");
-}
-
-// Fixed glitch letters for personalized messages
-function glitchLetters(text, container, index=0){
-  if(index >= text.length) return;
+function glitchLetters(text, container, index = 0) {
+  if (index >= text.length) return;
   const char = text[index];
-  if(char === "\n"){
-    container.appendChild(document.createElement("br"));
-  } else if(char === " "){
+  if (char === " ") {
     container.appendChild(document.createTextNode(" "));
   } else {
     const span = document.createElement("span");
@@ -338,24 +358,36 @@ function glitchLetters(text, container, index=0){
     span.textContent = char;
     container.appendChild(span);
   }
-  setTimeout(()=>glitchLetters(text, container, index+1),30);
+  setTimeout(() => glitchLetters(text, container, index + 1), 28);
 }
 
-function showPersonal(){
-  const name=(localStorage.getItem("archive_name")||"").toLowerCase();
-  const container=document.getElementById("personal");
-  container.innerHTML="";
-  let messages=personalMessages[name]||["Welcome, guest.","Enjoy the hidden archive."];
-  let delay=0;
-  messages.forEach(msg=>{
-    setTimeout(()=>{
-      glitchLetters(msg,container);
-      container.appendChild(document.createElement("br"));
+function showPersonal() {
+  const name = (localStorage.getItem("archive_name") || "").toLowerCase();
+  const box = document.getElementById("personal");
+  box.innerHTML = "";
+  const lines = personalMessages[name] || ["Welcome, guest.","Enjoy the hidden archive."];
+  let delay = 0;
+  lines.forEach(line => {
+    setTimeout(() => {
+      glitchLetters(line, box);
+      box.appendChild(document.createElement("br"));
     }, delay);
-    delay += msg.length*35 + 150;
+    delay += line.length * 35 + 160;
   });
-  document.getElementById("greeting").innerText="Welcome to the Archive!";
+  document.getElementById("greeting").innerText = "Welcome to the Archive!";
 }
+
+/* ================= VIDEO SPOILERS ================= */
+
+window.revealVideo = function(id) {
+  const wrapper = document.getElementById(id);
+  const overlay = wrapper.querySelector(".spoiler-overlay");
+  if (!overlay || overlay.classList.contains("hidden")) return;
+  wrapper.classList.add("reveal");
+  setTimeout(() => overlay.classList.add("hidden"), 700);
+};
+
+/* ================= MUSIC VOTING (FIRESTORE, SHARED) ================= */
 
 const musicVideos = [
   { title: "Coconut Mall", id: "mrAG3bZ0NGA", url: "https://www.youtube.com/watch?v=mrAG3bZ0NGA" },
@@ -368,53 +400,55 @@ const musicVideos = [
   { title: "Chess Type Beat", id: "EK2w6qA5zz8", url: "https://www.youtube.com/watch?v=EK2w6qA5zz8" }
 ];
 
-function getVoteRecords() {
-  try {
-    return JSON.parse(localStorage.getItem("archive_music_votes") || "{}");
-  } catch (error) {
-    return {};
-  }
-}
-
-function saveVoteRecords(records) {
-  localStorage.setItem("archive_music_votes", JSON.stringify(records));
-}
+const votesCol = collection(db, "musicVotes");
+let liveVotes = {};
 
 function renderVoteTally() {
-  const tally = musicVideos.reduce((acc, video) => {
-    acc[video.title] = 0;
-    return acc;
-  }, {});
-  const records = getVoteRecords();
-  Object.values(records).forEach(option => {
-    if (tally[option] !== undefined) {
-      tally[option] += 1;
+  const tally = {};
+  musicVideos.forEach(v => tally[v.id] = 0);
+
+  Object.values(liveVotes).forEach(vote => {
+    if (tally[vote.choiceId] !== undefined) {
+      tally[vote.choiceId]++;
     }
   });
-  const list = document.getElementById("voteTally");
-  list.innerHTML = "";
-  musicVideos.forEach(video => {
-    const item = document.createElement("li");
-    item.textContent = `${video.title}: ${tally[video.title]} vote${tally[video.title] === 1 ? "" : "s"}`;
-    list.appendChild(item);
+
+  const ul = document.getElementById("voteTally");
+  ul.innerHTML = "";
+  musicVideos.forEach(v => {
+    const li = document.createElement("li");
+    li.textContent = `${v.title}: ${tally[v.id]} vote${tally[v.id] === 1 ? "" : "s"}`;
+    ul.appendChild(li);
   });
 }
 
-function castVote(option) {
+function startVoteListener() {
+  onSnapshot(query(votesCol), snap => {
+    const next = {};
+    snap.forEach(d => next[d.id] = d.data());
+    liveVotes = next;
+    renderVoteTally();
+  });
+}
+
+function castVote(video) {
   const nameInput = document.getElementById("voteName");
   const status = document.getElementById("voteStatus");
-  const name = nameInput.value.trim();
-  if (!name) {
-    status.textContent = "A name is required to log a vote.";
+  const raw = nameInput.value.trim();
+  const id = raw.toLowerCase();
+  if (!id) {
+    status.textContent = "A name is required to vote.";
     status.style.color = "#ff9a9a";
     return;
   }
-  const records = getVoteRecords();
-  records[name.toLowerCase()] = option;
-  saveVoteRecords(records);
-  status.textContent = `Vote recorded for ${option}. Thank you, ${name}.`;
+  setDoc(doc(db, "musicVotes", id), {
+    displayName: raw,
+    choiceId: video.id,
+    choiceTitle: video.title,
+    updatedAt: serverTimestamp()
+  }, { merge: true });
+  status.textContent = `Vote recorded for "${video.title}".`;
   status.style.color = "#9affc8";
-  renderVoteTally();
 }
 
 function renderMusicOptions() {
@@ -426,25 +460,27 @@ function renderMusicOptions() {
     card.innerHTML = `
       <h3>${video.title}</h3>
       <iframe src="https://www.youtube.com/embed/${video.id}" allowfullscreen></iframe>
-      <button type="button" onclick="castVote('${video.title}')">Vote for this video</button>
       <a class="download" href="${video.url}" target="_blank">Open on YouTube</a>
     `;
+    const btn = document.createElement("button");
+    btn.textContent = "Vote for this video";
+    btn.onclick = () => castVote(video);
+    card.appendChild(btn);
     list.appendChild(card);
   });
 }
 
-function toggleMusicSection() {
+window.toggleMusicSection = function() {
   const section = document.getElementById("musicVoteSection");
   section.classList.toggle("visible");
-  if (section.classList.contains("visible")) {
-    section.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-}
+};
+
+/* ================= INIT ================= */
 
 window.onload = () => {
   showPersonal();
   renderMusicOptions();
-  renderVoteTally();
+  startVoteListener();
 };
 </script>
 </body>
